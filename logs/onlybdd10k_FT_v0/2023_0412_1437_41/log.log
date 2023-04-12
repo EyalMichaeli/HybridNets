@@ -1,0 +1,12 @@
+2023-04-12 14:37:42,227 INFO 
+Avaliable images: 70000
+2023-04-12 14:37:42,227 INFO Running on 10000 images
+2023-04-12 14:37:42,234 INFO building database...
+2023-04-12 14:37:43,840 INFO database build finish
+2023-04-12 14:37:43,853 INFO 
+Avaliable images: 10000
+2023-04-12 14:37:43,853 INFO Running on 10000 images
+2023-04-12 14:37:43,854 INFO building database...
+2023-04-12 14:37:45,456 INFO database build finish
+2023-04-12 14:37:47,406 INFO [Info] Successfully!!!
+2023-04-12 14:43:23,251 INFO checkpoint...

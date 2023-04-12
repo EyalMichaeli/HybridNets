@@ -14,3 +14,7 @@ torch>=1.10.0
 torchvision>=0.11.0
 tqdm>=4.61.2
 webcolors>=1.11.1
+# I added these
+chardet
+torchshow
+thorchinfo 

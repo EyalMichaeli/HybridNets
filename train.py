@@ -2,7 +2,7 @@ import argparse
 import datetime
 import os
 import traceback
-
+import logging
 import numpy as np
 import torch
 from tensorboardX import SummaryWriter
@@ -23,63 +23,35 @@ from collections import OrderedDict
 from torchinfo import summary
 
 
-def get_args():
-    parser = argparse.ArgumentParser('HybridNets: End-to-End Perception Network - DatVu')
-    parser.add_argument('-p', '--project', type=str, default='bdd100k', help='Project file that contains parameters')
-    parser.add_argument('-bb', '--backbone', type=str, help='Use timm to create another backbone replacing efficientnet. '
-                                                            'https://github.com/rwightman/pytorch-image-models')
-    parser.add_argument('-c', '--compound_coef', type=int, default=3, help='Coefficient of efficientnet backbone')
-    parser.add_argument('-n', '--num_workers', type=int, default=8, help='Num_workers of dataloader')
-    parser.add_argument('-b', '--batch_size', type=int, default=12, help='Number of images per batch among all devices')
-    parser.add_argument('--freeze_backbone', type=boolean_string, default=False,
-                        help='Freeze encoder and neck (effnet and bifpn)')
-    parser.add_argument('--freeze_det', type=boolean_string, default=False,
-                        help='Freeze detection head')
-    parser.add_argument('--freeze_seg', type=boolean_string, default=False,
-                        help='Freeze segmentation head')
-    parser.add_argument('--lr', type=float, default=1e-4)
-    parser.add_argument('--optim', type=str, default='adamw', help='Select optimizer for training, '
-                                                                   'suggest using \'adamw\' until the'
-                                                                   ' very final stage then switch to \'sgd\'')
-    parser.add_argument('--num_epochs', type=int, default=500)
-    parser.add_argument('--val_interval', type=int, default=1, help='Number of epoches between valing phases')
-    parser.add_argument('--save_interval', type=int, default=500, help='Number of steps between saving')
-    parser.add_argument('--es_min_delta', type=float, default=0.0,
-                        help='Early stopping\'s parameter: minimum change loss to qualify as an improvement')
-    parser.add_argument('--es_patience', type=int, default=0,
-                        help='Early stopping\'s parameter: number of epochs with no improvement after which '
-                             'training will be stopped. Set to 0 to disable this technique')
-    parser.add_argument('--data_path', type=str, default='datasets/', help='The root folder of dataset')
-    parser.add_argument('--log_path', type=str, default='checkpoints/')
-    parser.add_argument('-w', '--load_weights', type=str, default=None,
-                        help='Whether to load weights from a checkpoint, set None to initialize,'
-                             'set \'last\' to load last checkpoint')
-    parser.add_argument('--saved_path', type=str, default='checkpoints/')
-    parser.add_argument('--debug', type=boolean_string, default=False,
-                        help='Whether visualize the predicted boxes of training, '
-                             'the output images will be in test/, '
-                             'and also only use first 500 images.')
-    parser.add_argument('--cal_map', type=boolean_string, default=True,
-                        help='Calculate mAP in validation')
-    parser.add_argument('-v', '--verbose', type=boolean_string, default=True,
-                        help='Whether to print results per class when valing')
-    parser.add_argument('--plots', type=boolean_string, default=True,
-                        help='Whether to plot confusion matrix when valing')
-    parser.add_argument('--num_gpus', type=int, default=1,
-                        help='Number of GPUs to be used (0 to use CPU)')
-    parser.add_argument('--conf_thres', type=float, default=0.001,
-                        help='Confidence threshold in NMS')
-    parser.add_argument('--iou_thres', type=float, default=0.6,
-                        help='IoU threshold in NMS')
-    parser.add_argument('--amp', type=boolean_string, default=False,
-                        help='Automatic Mixed Precision training')
+def get_date_uid():
+    """Generate a unique id based on date.
+    Returns:
+        str: Return uid string, e.g. '20171122171307111552'.
+    """
+    return str(datetime.datetime.now().strftime("%Y_%m%d_%H%M_%S"))
 
-    args = parser.parse_args()
-    return args
+
+def init_logging(logdir):
+    r"""
+    Create log directory for storing checkpoints and output images.
+
+    Args:
+        logdir (str): Log directory name
+    """
+    logdir = os.path.join(logdir, get_date_uid())
+    if not os.path.exists(logdir):
+        os.makedirs(logdir, exist_ok=True)
+    log_file = os.path.join(logdir, 'log.log')
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
+    fh = logging.FileHandler(log_file, mode='w')
+    fh.setFormatter(logging.Formatter('%(asctime)s %(levelname)s %(message)s'))
+    logging.getLogger().addHandler(fh)
+    return logdir
+
 
 def train(opt):
     torch.backends.cudnn.benchmark = True
-    print("\nCUDNN VERSION: {}\n".format(torch.backends.cudnn.version()))
+    logging.info("\nCUDNN VERSION: {}\n".format(torch.backends.cudnn.version()))
     params = Params(f'projects/{opt.project}.yml')
 
     if opt.num_gpus == 0:
@@ -90,7 +62,8 @@ def train(opt):
     else:
         torch.manual_seed(42)
 
-    opt.saved_path = opt.saved_path + f'/{opt.project}/'
+    opt.log_path = init_logging(opt.log_path)
+    opt.saved_path = opt.log_path + f'/checkpoints'
     opt.log_path = opt.log_path + f'/{opt.project}/tensorboard/'
     os.makedirs(opt.log_path, exist_ok=True)
     os.makedirs(opt.saved_path, exist_ok=True)
@@ -169,30 +142,30 @@ def train(opt):
             # new_weight = OrderedDict((k[6:], v) for k, v in ckpt['model'].items())
             model.load_state_dict(ckpt.get('model', ckpt), strict=False)
         except RuntimeError as e:
-            print(f'[Warning] Ignoring {e}')
-            print(
+            logging.info(f'[Warning] Ignoring {e}')
+            logging.info(
                 '[Warning] Don\'t panic if you see this, this might be because you load a pretrained weights with different number of classes. The rest of the weights should be loaded already.')
     else:
-        print('[Info] initializing weights...')
+        logging.info('[Info] initializing weights...')
         init_weights(model)
 
-    print('[Info] Successfully!!!')
+    logging.info('[Info] Successfully!!!')
 
     if opt.freeze_backbone:
         model.encoder.requires_grad_(False)
         model.bifpn.requires_grad_(False)
-        print('[Info] freezed backbone')
+        logging.info('[Info] freezed backbone')
 
     if opt.freeze_det:
         model.regressor.requires_grad_(False)
         model.classifier.requires_grad_(False)
         model.anchors.requires_grad_(False)
-        print('[Info] freezed detection head')
+        logging.info('[Info] freezed detection head')
 
     if opt.freeze_seg:
         model.bifpndecoder.requires_grad_(False)
         model.segmentation_head.requires_grad_(False)
-        print('[Info] freezed segmentation head')
+        logging.info('[Info] freezed segmentation head')
     #summary(model, (1, 3, 384, 640), device='cpu')
 
     writer = SummaryWriter(opt.log_path + f'/{datetime.datetime.now().strftime("%Y%m%d-%H%M%S")}/')
@@ -209,7 +182,7 @@ def train(opt):
         optimizer = torch.optim.AdamW(model.parameters(), opt.lr)
     else:
         optimizer = torch.optim.SGD(model.parameters(), opt.lr, momentum=0.9, nesterov=True)
-    # print(ckpt)
+    # logging.info(ckpt)
     scaler = torch.cuda.amp.GradScaler(enabled=opt.amp)
     # if opt.load_weights is not None and ckpt.get('optimizer', None):
         # scaler.load_state_dict(ckpt['scaler'])
@@ -291,11 +264,11 @@ def train(opt):
 
                     if step % opt.save_interval == 0 and step > 0:
                         save_checkpoint(model, opt.saved_path, f'hybridnets-d{opt.compound_coef}_{epoch}_{step}.pth')
-                        print('checkpoint...')
+                        logging.info('checkpoint...')
 
                 except Exception as e:
-                    print('[Error]', traceback.format_exc())
-                    print(e)
+                    logging.info('[Error]', traceback.format_exc())
+                    logging.info(e)
                     continue
 
             scheduler.step(np.mean(epoch_loss))
@@ -310,6 +283,64 @@ def train(opt):
         writer.close()
 
 
+def get_args():
+    parser = argparse.ArgumentParser('HybridNets: End-to-End Perception Network - DatVu')
+    parser.add_argument('-p', '--project', type=str, default='bdd100k', help='Project file that contains parameters')
+    parser.add_argument('-bb', '--backbone', type=str, help='Use timm to create another backbone replacing efficientnet. '
+                                                            'https://github.com/rwightman/pytorch-image-models')
+    parser.add_argument('-c', '--compound_coef', type=int, default=3, help='Coefficient of efficientnet backbone')
+    parser.add_argument('-n', '--num_workers', type=int, default=8, help='Num_workers of dataloader')
+    parser.add_argument('-b', '--batch_size', type=int, default=12, help='Number of images per batch among all devices')
+    parser.add_argument('--freeze_backbone', type=boolean_string, default=False,
+                        help='Freeze encoder and neck (effnet and bifpn)')
+    parser.add_argument('--freeze_det', type=boolean_string, default=False,
+                        help='Freeze detection head')
+    parser.add_argument('--freeze_seg', type=boolean_string, default=False,
+                        help='Freeze segmentation head')
+    parser.add_argument('--lr', type=float, default=1e-4)
+    parser.add_argument('--optim', type=str, default='adamw', help='Select optimizer for training, '
+                                                                   'suggest using \'adamw\' until the'
+                                                                   ' very final stage then switch to \'sgd\'')
+    parser.add_argument('--num_epochs', type=int, default=500)
+    parser.add_argument('--val_interval', type=int, default=1, help='Number of epoches between valing phases')
+    parser.add_argument('--save_interval', type=int, default=500, help='Number of steps between saving')
+    parser.add_argument('--es_min_delta', type=float, default=0.0,
+                        help='Early stopping\'s parameter: minimum change loss to qualify as an improvement')
+    parser.add_argument('--es_patience', type=int, default=0,
+                        help='Early stopping\'s parameter: number of epochs with no improvement after which '
+                             'training will be stopped. Set to 0 to disable this technique')
+    parser.add_argument('--data_path', type=str, default='datasets/', help='The root folder of dataset')
+    parser.add_argument('--log_path', type=str, default='logs/')
+    parser.add_argument('-w', '--load_weights', type=str, default=None,
+                        help='Whether to load weights from a checkpoint, set None to initialize,'
+                             'set \'last\' to load last checkpoint')
+    #parser.add_argument('--saved_path', type=str, default='logs/')
+    parser.add_argument('--debug', type=boolean_string, default=False,
+                        help='Whether visualize the predicted boxes of training, '
+                             'the output images will be in test/, '
+                             'and also only use first 500 images.')
+    parser.add_argument('--cal_map', type=boolean_string, default=True,
+                        help='Calculate mAP in validation')
+    parser.add_argument('-v', '--verbose', type=boolean_string, default=True,
+                        help='Whether to print results per class when valing')
+    parser.add_argument('--plots', type=boolean_string, default=True,
+                        help='Whether to plot confusion matrix when valing')
+    parser.add_argument('--num_gpus', type=int, default=1,
+                        help='Number of GPUs to be used (0 to use CPU)')
+    parser.add_argument('--conf_thres', type=float, default=0.001,
+                        help='Confidence threshold in NMS')
+    parser.add_argument('--iou_thres', type=float, default=0.6,
+                        help='IoU threshold in NMS')
+    parser.add_argument('--amp', type=boolean_string, default=False,
+                        help='Automatic Mixed Precision training')
+
+    args = parser.parse_args()
+    return args
+
+
 if __name__ == '__main__':
+    """
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --log_path ./logs/onlybdd10k_FT_v0 -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a first_run_bdd10k_pretrained.txt & 
+    """
     opt = get_args()
     train(opt)

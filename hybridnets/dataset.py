@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import logging
 # np.set_printoptions(threshold=np.inf)
 import random
 import torch
@@ -15,8 +16,10 @@ from utils.constants import *
 import torchshow
 
 
+AMOUNT_TO_RUN_ON = 10000
+
 class BddDataset(Dataset):
-    def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False):
+    def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False, amount_to_run_on=AMOUNT_TO_RUN_ON):
         """
         initial all the characteristic
 
@@ -32,7 +35,7 @@ class BddDataset(Dataset):
         self.transform = transform
         self.inputsize = inputsize
         self.Tensor = transforms.ToTensor()
-        img_root = Path(params.dataset['dataroot'])
+        img_root = Path(params.dataset['dataroot']) 
         label_root = Path(params.dataset['labelroot'])
         seg_root = params.dataset['segroot']
         self.seg_list = params.seg_list
@@ -40,9 +43,15 @@ class BddDataset(Dataset):
             indicator = params.dataset['train_set']
         else:
             indicator = params.dataset['test_set']
-        self.img_root = img_root / indicator
+        self.img_root = img_root / indicator / "images_a"     
+
         self.label_root = label_root / indicator
         self.label_list = list(self.label_root.iterdir())
+        if amount_to_run_on is not None:
+            logging.info(f"\nAvaliable images: {len(self.label_list)}")
+            logging.info(f"Running on {amount_to_run_on} images")
+            self.label_list = self.label_list[:amount_to_run_on]
+
         if debug:
             self.label_list = self.label_list[:50]
         self.seg_root = []
@@ -73,7 +82,7 @@ class BddDataset(Dataset):
         """
         TODO: add docs
         """
-        print('building database...')
+        logging.info('building database...')
         gt_db = []
         height, width = self.shapes
         for label in tqdm(self.label_list, ascii=True):
@@ -116,11 +125,11 @@ class BddDataset(Dataset):
             # img = cv2.imread(image_path, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION | cv2.IMREAD_UNCHANGED)
             # # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             # for label in gt:
-            #     # print(label[1])
+            #     # logging.info(label[1])
             #     x1 = label[1] - label[3] / 2
             #     x1 *= 1280
             #     x1 = int(x1)
-            #     # print(x1)
+            #     # logging.info(x1)
             #     x2 = label[1] + label[3] / 2
             #     x2 *= 1280
             #     x2 = int(x2)
@@ -134,7 +143,7 @@ class BddDataset(Dataset):
             # cv2.imwrite('gt/{}'.format(image_path.split('/')[-1]), img)
 
             gt_db.append(rec)
-        print('database build finish')
+        logging.info('database build finish')
         return gt_db
 
 
@@ -343,7 +352,7 @@ class BddDataset(Dataset):
 
         # for anno in labels:
         #   x1, y1, x2, y2 = [int(x) for x in anno[1:5]]
-        #   print(x1,y1,x2,y2)
+        #   logging.info(x1,y1,x2,y2)
         #   cv2.rectangle(img, (x1,y1), (x2,y2), (0,0,255), 3)
         # cv2.imwrite(data["image"].split("/")[-1], img)
 
@@ -365,15 +374,15 @@ class BddDataset(Dataset):
 
         img = np.ascontiguousarray(img)
 
-        # print(img.shape)
+        # logging.info(img.shape)
         # img_copy = img.copy()
         # np.savetxt('seglabelroad', seg_label['road'])
-        # print(np.count_nonzero(seg_label['road']))
-        # print(np.count_nonzero(seg_label['road'][seg_label['road']==114]))
+        # logging.info(np.count_nonzero(seg_label['road']))
+        # logging.info(np.count_nonzero(seg_label['road'][seg_label['road']==114]))
         # img_copy[seg_label['road'] == 255] = (0, 255, 0)
         # if seg_label['road'][np.logical_and(seg_label['road'] > 0, seg_label['road'] < 255)].any():
-        #     print(np.count_nonzero(seg_label['road'][np.logical_and(seg_label['road'] > 0, seg_label['road'] < 255)]))
-        #     print(seg_label['road'][seg_label['road'][np.logical_and(seg_label['road'] > 0, seg_label['road'] < 255)]])
+        #     logging.info(np.count_nonzero(seg_label['road'][np.logical_and(seg_label['road'] > 0, seg_label['road'] < 255)]))
+        #     logging.info(seg_label['road'][seg_label['road'][np.logical_and(seg_label['road'] > 0, seg_label['road'] < 255)]])
         # img_copy[seg_label['lane'] == 255] = (0, 0, 255)
         # union = np.zeros(img.shape[:2], dtype=np.uint8)
         # for seg_class in seg_label:
@@ -385,7 +394,7 @@ class BddDataset(Dataset):
         # cv2.imwrite('_background.jpg', background)
 
         # for anno in labels_app:
-        #     print(anno)
+        #     logging.info(anno)
         #     x1, y1, x2, y2 = [int(x) for x in anno[anno != -1][:4]]
         #     cv2.rectangle(img_copy, (x1,y1), (x2,y2), (0,0,255), 1)
         # cv2.imwrite('_box.jpg', img_copy)
@@ -416,10 +425,10 @@ class BddDataset(Dataset):
             # torchshow.save(seg_label['road'], path='/home/ctv.baonvh/new_hybridnets/HybridNets/_road.png', mode='grayscale')
             # torchshow.save(seg_label['lane'], path='/home/ctv.baonvh/new_hybridnets/HybridNets/_lane.png', mode='grayscale')
                 
-            # print(seg_label['road'][seg_label['road'] == -255])
+            # logging.info(seg_label['road'][seg_label['road'] == -255])
             # if seg_label['road'][np.logical_and(seg_label['road'] != 0, seg_label['road'] != 255)].any():
-                # print("FOUND WRONG")
-                # print([seg_label['road'][np.logical_and(seg_label['road'] != 0, seg_label['road'] != 255)]])
+                # logging.info("FOUND WRONG")
+                # logging.info([seg_label['road'][np.logical_and(seg_label['road'] != 0, seg_label['road'] != 255)]])
 
             segmentation = np.zeros(img.shape[:2], dtype=np.uint8)
             segmentation = self.Tensor(segmentation)
@@ -497,7 +506,7 @@ class BddDataset(Dataset):
     def collate_fn(batch):
         img, paths, shapes, labels_app, segmentation = zip(*batch)
         # filenames = [file.split('/')[-1] for file in paths]
-        # print(len(labels_app))
+        # logging.info(len(labels_app))
         max_num_annots = max(label.size(0) for label in labels_app)
 
         if max_num_annots > 0:
@@ -508,6 +517,6 @@ class BddDataset(Dataset):
         else:
             annot_padded = torch.ones((len(labels_app), 1, 5)) * -1
 
-        # print("ABC", seg1.size())
+        # logging.info("ABC", seg1.size())
         return {'img': torch.stack(img, 0), 'annot': annot_padded, 'segmentation': torch.stack(segmentation, 0),
                 'filenames': None, 'shapes': shapes}
