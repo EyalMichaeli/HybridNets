@@ -204,7 +204,8 @@ def train(opt):
             # last_epoch = step // num_iter_per_epoch
             # if epoch < last_epoch:
             #     continue
-
+            logging.info(f'Epoch {epoch + 1}/{opt.num_epochs}')
+            
             epoch_loss = []
             progress_bar = tqdm(training_generator, ascii=True)
             for iter, data in enumerate(progress_bar):
@@ -247,24 +248,25 @@ def train(opt):
 
                     epoch_loss.append(float(loss))
 
-                    progress_bar.set_description(
-                        'Step: {}. Epoch: {}/{}. Iteration: {}/{}. Cls loss: {:.5f}. Reg loss: {:.5f}. Seg loss: {:.5f}. Total loss: {:.5f}'.format(
-                            step, epoch, opt.num_epochs, iter + 1, num_iter_per_epoch, cls_loss.item(),
-                            reg_loss.item(), seg_loss.item(), loss.item()))
-                    writer.add_scalars('Loss', {'train': loss}, step)
-                    writer.add_scalars('Regression_loss', {'train': reg_loss}, step)
-                    writer.add_scalars('Classfication_loss', {'train': cls_loss}, step)
-                    writer.add_scalars('Segmentation_loss', {'train': seg_loss}, step)
-
-                    # log learning_rate
-                    current_lr = optimizer.param_groups[0]['lr']
-                    writer.add_scalar('learning_rate', current_lr, step)
+                    if step % 100 and step > 0:
+                        progress_bar.set_description(
+                            'Step: {}. Epoch: {}/{}. Iteration: {}/{}. Cls loss: {:.3f}. Reg loss: {:.3f}. Seg loss: {:.3f}. Total loss: {:.3f}'.format(
+                                step, epoch, opt.num_epochs, iter + 1, num_iter_per_epoch, cls_loss.float().item(),
+                                reg_loss.item(), seg_loss.item(), loss.item()))
 
                     step += 1
 
                     if step % opt.save_interval == 0 and step > 0:
+                        writer.add_scalars('Loss', {'train': loss}, step)
+                        writer.add_scalars('Regression_loss', {'train': reg_loss}, step)
+                        writer.add_scalars('Classfication_loss', {'train': cls_loss}, step)
+                        writer.add_scalars('Segmentation_loss', {'train': seg_loss}, step)
+
+                        # log learning_rate
+                        current_lr = optimizer.param_groups[0]['lr']
+                        writer.add_scalar('learning_rate', current_lr, step)
                         save_checkpoint(model, opt.saved_path, f'hybridnets-d{opt.compound_coef}_{epoch}_{step}.pth')
-                        logging.info('checkpoint...')
+                        logging.info('Saved checkpoint to: ' + f'{opt.saved_path}/hybridnets-d{opt.compound_coef}_{epoch}_{step}.pth')
 
                 except Exception as e:
                     logging.info('[Error]', traceback.format_exc())
@@ -340,7 +342,8 @@ def get_args():
 
 if __name__ == '__main__':
     """
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --log_path ./logs/onlybdd10k_FT_v0 -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a first_run_bdd10k_pretrained.txt & 
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py --log_path ./logs/onlybdd10k_FT_v0_bs_8 -p bdd10k -c 3 -b 8  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a first_run_bdd10k_pretrained_bs_8.txt & 
     """
     opt = get_args()
     train(opt)
+

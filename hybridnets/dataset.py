@@ -48,7 +48,7 @@ class BddDataset(Dataset):
         self.label_root = label_root / indicator
         self.label_list = list(self.label_root.iterdir())
         if amount_to_run_on is not None:
-            logging.info(f"\nAvaliable images: {len(self.label_list)}")
+            logging.info(f"Avaliable images: {len(self.label_list)}")
             logging.info(f"Running on {amount_to_run_on} images")
             self.label_list = self.label_list[:amount_to_run_on]
 
