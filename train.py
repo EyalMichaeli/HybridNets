@@ -248,11 +248,13 @@ def train(opt):
 
                     epoch_loss.append(float(loss))
 
-                    if step % 100 and step > 0:
+                    if step % 50 and step > 0:
                         progress_bar.set_description(
                             'Step: {}. Epoch: {}/{}. Iteration: {}/{}. Cls loss: {:.3f}. Reg loss: {:.3f}. Seg loss: {:.3f}. Total loss: {:.3f}'.format(
                                 step, epoch, opt.num_epochs, iter + 1, num_iter_per_epoch, cls_loss.float().item(),
                                 reg_loss.item(), seg_loss.item(), loss.item()))
+                        writer.add_scalars('GPU_max_memory', {'train': torch.cuda.max_memory_allocated() / 1024 ** 3}, step)
+                        writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step)
 
                     step += 1
 
@@ -261,7 +263,7 @@ def train(opt):
                         writer.add_scalars('Regression_loss', {'train': reg_loss}, step)
                         writer.add_scalars('Classfication_loss', {'train': cls_loss}, step)
                         writer.add_scalars('Segmentation_loss', {'train': seg_loss}, step)
-
+                        
                         # log learning_rate
                         current_lr = optimizer.param_groups[0]['lr']
                         writer.add_scalar('learning_rate', current_lr, step)
@@ -342,7 +344,11 @@ def get_args():
 
 if __name__ == '__main__':
     """
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py --log_path ./logs/onlybdd10k_FT_v0_bs_8 -p bdd10k -c 3 -b 8  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a first_run_bdd10k_pretrained_bs_8.txt & 
+
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --freeze_backbone "True" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_amp -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a first_run_bdd10k_pretrained_bs_16_with_amp_freezed_backbone.txt & 
+    
+    tensorboard --logdir=logs --port=6007
+
     """
     opt = get_args()
     train(opt)
