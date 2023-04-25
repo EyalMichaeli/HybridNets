@@ -1,0 +1,12 @@
+2023-04-15 21:57:07,668 INFO Avaliable images: 70000
+2023-04-15 21:57:07,668 INFO Running on 10000 images
+2023-04-15 21:57:07,675 INFO building database...
+2023-04-15 21:57:09,620 INFO database build finish
+2023-04-15 21:57:09,634 INFO Avaliable images: 10000
+2023-04-15 21:57:09,634 INFO Running on 10000 images
+2023-04-15 21:57:09,634 INFO building database...
+2023-04-15 21:57:11,476 INFO database build finish
+2023-04-15 21:57:13,875 INFO [Info] Successfully!!!
+2023-04-15 21:57:14,101 INFO Epoch 1/50
+2023-04-15 22:01:52,981 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_8_with_amp/2023_0415_2157_07/checkpoints/hybridnets-d3_0_500.pth
+2023-04-15 22:06:02,751 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_8_with_amp/2023_0415_2157_07/checkpoints/hybridnets-d3_0_1000.pth

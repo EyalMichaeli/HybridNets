@@ -6,6 +6,7 @@ import yaml
 from scipy.cluster.vq import kmeans
 from tqdm.autonotebook import tqdm
 import math
+import logging
 
 
 def check_anchor_order(anchors, anchor_grid, stride):
@@ -14,7 +15,7 @@ def check_anchor_order(anchors, anchor_grid, stride):
     da = a[-1] - a[0]  # delta a
     ds = stride[-1] - stride[0]  # delta s
     if da.sign() != ds.sign():  # same order
-        print('Reversing anchor order')
+        logging.info('Reversing anchor order')
         anchors[:] = anchors.flip(0)
         anchor_grid[:] = anchor_grid.flip(0)
     return anchors, anchor_grid, stride
@@ -41,9 +42,9 @@ def run_anchor(logger, dataset, thr=4.0, imgsz=640):
     ratios[1] = (np.mean(normalized_anchors[:, 0]), np.mean(normalized_anchors[:, 1]))
     ratios[2] = (np.mean(normalized_anchors[:, 1]), np.mean(normalized_anchors[:, 0]))
     ratios = [(round(x, 2), round(y, 2)) for x, y in ratios]
-    print("New scales:", scales)
-    print("New ratios:", ratios)
-    print('New anchors saved to model. Update model config to use these anchors in the future.')
+    logging.info("New scales:", scales)
+    logging.info("New ratios:", ratios)
+    logging.info('New anchors saved to model. Update model config to use these anchors in the future.')
     return str(scales), str(ratios)
 
 
@@ -80,11 +81,11 @@ def kmean_anchors(path='./data/coco128.yaml', n=9, img_size=640, thr=4.0, gen=10
         k = k[np.argsort(k.prod(1))]  # sort small to large
         x, best = metric(k, wh0)
         bpr, aat = (best > thr).float().mean(), (x > thr).float().mean() * n  # best possible recall, anch > thr
-        print('thr=%.2f: %.4f best possible recall, %.2f anchors past thr' % (thr, bpr, aat))
-        print('n=%g, img_size=%s, metric_all=%.3f/%.3f-mean/best, past_thr=%.3f-mean: ' %
+        logging.info('thr=%.2f: %.4f best possible recall, %.2f anchors past thr' % (thr, bpr, aat))
+        logging.info('n=%g, img_size=%s, metric_all=%.3f/%.3f-mean/best, past_thr=%.3f-mean: ' %
               (n, img_size, x.mean(), best.mean(), x[x > thr].mean()), end='')
         for i, x in enumerate(k):
-            print('%i,%i' % (round(x[0]), round(x[1])), end=',  ' if i < len(k) - 1 else '\n')  # use in *.cfg
+            logging.info('%i,%i' % (round(x[0]), round(x[1])), end=',  ' if i < len(k) - 1 else '\n')  # use in *.cfg
         return k
 
     if isinstance(path, str):  # not class
@@ -105,12 +106,12 @@ def kmean_anchors(path='./data/coco128.yaml', n=9, img_size=640, thr=4.0, gen=10
     # Filter
     i = (wh0 < 3.0).any(1).sum()
     if i:
-        print('WARNING: Extremely small objects found. '
+        logging.info('WARNING: Extremely small objects found. '
               '%g of %g labels are < 3 pixels in width or height.' % (i, len(wh0)))
     wh = wh0[(wh0 >= 2.0).any(1)]  # filter > 2 pixels
 
     # Kmeans calculation
-    print('Running kmeans for %g anchors on %g points...' % (n, len(wh)))
+    logging.info('Running kmeans for %g anchors on %g points...' % (n, len(wh)))
     s = wh.std(0)  # sigmas for whitening
     k, dist = kmeans(wh / s, n, iter=30)  # points, mean distance
     k *= s

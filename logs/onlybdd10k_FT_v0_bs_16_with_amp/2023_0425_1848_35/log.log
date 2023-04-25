@@ -1,0 +1,11 @@
+2023-04-25 18:48:35,866 INFO Avaliable images: 70000
+2023-04-25 18:48:35,866 INFO Running on 10000 images
+2023-04-25 18:48:35,874 INFO building database...
+2023-04-25 18:48:37,983 INFO database build finish
+2023-04-25 18:48:38,001 INFO Avaliable images: 10000
+2023-04-25 18:48:38,001 INFO Running on 10000 images
+2023-04-25 18:48:38,001 INFO building database...
+2023-04-25 18:48:39,838 INFO database build finish
+2023-04-25 18:48:42,215 INFO [Info] Successfully!!!
+2023-04-25 18:48:42,287 INFO Epoch 1/50
+2023-04-25 18:49:47,780 INFO Step: 100. Epoch: 0/50. Iteration: 101/625. Cls loss: 0.228. Reg loss: 2.333. Seg loss: 1.783. Total loss: 4.344

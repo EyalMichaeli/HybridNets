@@ -237,6 +237,9 @@ def train(opt):
                     if loss == 0 or not torch.isfinite(loss):
                         continue
 
+                    writer.add_scalars('GPU_max_memory', {'train': torch.cuda.max_memory_allocated() / 1024 ** 3}, step)
+                    writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step)
+
                     scaler.scale(loss).backward()
 
                     # Don't have to clip grad norm, since our gradients didn't explode anywhere in the training phases
@@ -248,13 +251,13 @@ def train(opt):
 
                     epoch_loss.append(float(loss))
 
-                    if step % 50 and step > 0:
-                        progress_bar.set_description(
+                    if step % 100 == 0 and step > 0:
+                        logging.info(
                             'Step: {}. Epoch: {}/{}. Iteration: {}/{}. Cls loss: {:.3f}. Reg loss: {:.3f}. Seg loss: {:.3f}. Total loss: {:.3f}'.format(
                                 step, epoch, opt.num_epochs, iter + 1, num_iter_per_epoch, cls_loss.float().item(),
                                 reg_loss.item(), seg_loss.item(), loss.item()))
-                        writer.add_scalars('GPU_max_memory', {'train': torch.cuda.max_memory_allocated() / 1024 ** 3}, step)
-                        writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step)
+                        # writer.add_scalars('GPU_max_memory', {'train': torch.cuda.max_memory_allocated() / 1024 ** 3}, step)
+                        # writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step)
 
                     step += 1
 
@@ -278,6 +281,7 @@ def train(opt):
             scheduler.step(np.mean(epoch_loss))
 
             if epoch % opt.val_interval == 0:
+                logging.info('NOT Validating...')
                 best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, is_training=True,
                                                           optimizer=optimizer, scaler=scaler, writer=writer, epoch=epoch, step=step, 
                                                           best_fitness=best_fitness, best_loss=best_loss, best_epoch=best_epoch)
@@ -345,7 +349,10 @@ def get_args():
 if __name__ == '__main__':
     """
 
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --freeze_backbone "True" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_amp -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a first_run_bdd10k_pretrained_bs_16_with_amp_freezed_backbone.txt & 
+    increased conf_thres to 0.5, because of issue (too high RAM memory, not related to GPU):
+    https://github.com/datvuthanh/HybridNets/issues/44
+
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_amp -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a first_run_bdd10k_pretrained_bs_16_with_amp_freezed_backbone_conf_thres_0.5.txt & 
     
     tensorboard --logdir=logs --port=6007
 
