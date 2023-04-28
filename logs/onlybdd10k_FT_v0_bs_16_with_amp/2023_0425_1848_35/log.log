@@ -9,3 +9,149 @@
 2023-04-25 18:48:42,215 INFO [Info] Successfully!!!
 2023-04-25 18:48:42,287 INFO Epoch 1/50
 2023-04-25 18:49:47,780 INFO Step: 100. Epoch: 0/50. Iteration: 101/625. Cls loss: 0.228. Reg loss: 2.333. Seg loss: 1.783. Total loss: 4.344
+2023-04-25 18:50:40,625 INFO Step: 200. Epoch: 0/50. Iteration: 201/625. Cls loss: 0.305. Reg loss: 2.830. Seg loss: 1.732. Total loss: 4.867
+2023-04-25 18:51:34,003 INFO Step: 300. Epoch: 0/50. Iteration: 301/625. Cls loss: 0.257. Reg loss: 2.516. Seg loss: 1.198. Total loss: 3.971
+2023-04-25 18:52:27,030 INFO Step: 400. Epoch: 0/50. Iteration: 401/625. Cls loss: 0.254. Reg loss: 3.335. Seg loss: 1.511. Total loss: 5.099
+2023-04-25 18:53:19,163 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_0_500.pth
+2023-04-25 18:53:20,931 INFO Step: 500. Epoch: 0/50. Iteration: 501/625. Cls loss: 0.220. Reg loss: 2.318. Seg loss: 1.638. Total loss: 4.176
+2023-04-25 18:54:14,114 INFO Step: 600. Epoch: 0/50. Iteration: 601/625. Cls loss: 0.231. Reg loss: 2.434. Seg loss: 1.710. Total loss: 4.375
+2023-04-25 18:54:24,777 INFO NOT Validating...
+2023-04-25 18:59:07,604 INFO Epoch 2/50
+2023-04-25 18:59:51,086 INFO Step: 700. Epoch: 1/50. Iteration: 76/625. Cls loss: 0.218. Reg loss: 2.485. Seg loss: 1.032. Total loss: 3.734
+2023-04-25 19:00:43,393 INFO Step: 800. Epoch: 1/50. Iteration: 176/625. Cls loss: 0.227. Reg loss: 2.276. Seg loss: 1.350. Total loss: 3.853
+2023-04-25 19:01:37,715 INFO Step: 900. Epoch: 1/50. Iteration: 276/625. Cls loss: 0.201. Reg loss: 2.394. Seg loss: 1.172. Total loss: 3.767
+2023-04-25 19:02:30,221 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_1_1000.pth
+2023-04-25 19:02:30,526 INFO Step: 1000. Epoch: 1/50. Iteration: 376/625. Cls loss: 0.227. Reg loss: 2.150. Seg loss: 1.144. Total loss: 3.520
+2023-04-25 19:03:24,226 INFO Step: 1100. Epoch: 1/50. Iteration: 476/625. Cls loss: 0.195. Reg loss: 2.098. Seg loss: 1.272. Total loss: 3.565
+2023-04-25 19:04:16,149 INFO Step: 1200. Epoch: 1/50. Iteration: 576/625. Cls loss: 0.225. Reg loss: 2.863. Seg loss: 1.026. Total loss: 4.114
+2023-04-25 19:04:39,958 INFO NOT Validating...
+2023-04-25 19:09:18,538 INFO Epoch 3/50
+2023-04-25 19:09:49,236 INFO Step: 1300. Epoch: 2/50. Iteration: 51/625. Cls loss: 0.215. Reg loss: 2.641. Seg loss: 1.047. Total loss: 3.903
+2023-04-25 19:10:41,796 INFO Step: 1400. Epoch: 2/50. Iteration: 151/625. Cls loss: 0.204. Reg loss: 2.349. Seg loss: 0.831. Total loss: 3.384
+2023-04-25 19:11:35,522 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_2_1500.pth
+2023-04-25 19:11:35,954 INFO Step: 1500. Epoch: 2/50. Iteration: 251/625. Cls loss: 0.220. Reg loss: 2.611. Seg loss: 0.934. Total loss: 3.765
+2023-04-25 19:12:27,788 INFO Step: 1600. Epoch: 2/50. Iteration: 351/625. Cls loss: 0.226. Reg loss: 3.195. Seg loss: 1.004. Total loss: 4.425
+2023-04-25 19:13:22,046 INFO Step: 1700. Epoch: 2/50. Iteration: 451/625. Cls loss: 0.210. Reg loss: 2.944. Seg loss: 0.892. Total loss: 4.046
+2023-04-25 19:14:13,913 INFO Step: 1800. Epoch: 2/50. Iteration: 551/625. Cls loss: 0.206. Reg loss: 2.204. Seg loss: 0.860. Total loss: 3.270
+2023-04-25 19:14:52,585 INFO NOT Validating...
+2023-04-25 19:19:30,720 INFO Epoch 4/50
+2023-04-25 19:19:48,447 INFO Step: 1900. Epoch: 3/50. Iteration: 26/625. Cls loss: 0.221. Reg loss: 2.574. Seg loss: 0.885. Total loss: 3.680
+2023-04-25 19:20:40,470 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_3_2000.pth
+2023-04-25 19:20:40,751 INFO Step: 2000. Epoch: 3/50. Iteration: 126/625. Cls loss: 0.210. Reg loss: 2.555. Seg loss: 0.576. Total loss: 3.341
+2023-04-25 19:21:34,787 INFO Step: 2100. Epoch: 3/50. Iteration: 226/625. Cls loss: 0.214. Reg loss: 2.429. Seg loss: 0.867. Total loss: 3.510
+2023-04-25 19:22:26,513 INFO Step: 2200. Epoch: 3/50. Iteration: 326/625. Cls loss: 0.206. Reg loss: 2.475. Seg loss: 0.707. Total loss: 3.388
+2023-04-25 19:23:19,711 INFO Step: 2300. Epoch: 3/50. Iteration: 426/625. Cls loss: 0.200. Reg loss: 1.954. Seg loss: 0.617. Total loss: 2.771
+2023-04-25 19:24:12,562 INFO Step: 2400. Epoch: 3/50. Iteration: 526/625. Cls loss: 0.231. Reg loss: 2.314. Seg loss: 0.601. Total loss: 3.146
+2023-04-25 19:25:03,031 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_3_2500.pth
+2023-04-25 19:25:03,032 INFO NOT Validating...
+2023-04-25 19:29:38,816 INFO Epoch 5/50
+2023-04-25 19:29:44,034 INFO Step: 2500. Epoch: 4/50. Iteration: 1/625. Cls loss: 0.203. Reg loss: 2.036. Seg loss: 0.644. Total loss: 2.884
+2023-04-25 19:30:35,540 INFO Step: 2600. Epoch: 4/50. Iteration: 101/625. Cls loss: 0.197. Reg loss: 2.479. Seg loss: 0.549. Total loss: 3.225
+2023-04-25 19:31:29,660 INFO Step: 2700. Epoch: 4/50. Iteration: 201/625. Cls loss: 0.222. Reg loss: 1.928. Seg loss: 0.565. Total loss: 2.714
+2023-04-25 19:32:21,229 INFO Step: 2800. Epoch: 4/50. Iteration: 301/625. Cls loss: 0.212. Reg loss: 2.686. Seg loss: 0.467. Total loss: 3.365
+2023-04-25 21:01:40,762 INFO Step: 2900. Epoch: 4/50. Iteration: 401/625. Cls loss: 0.174. Reg loss: 2.450. Seg loss: 0.665. Total loss: 3.289
+2023-04-25 21:02:35,178 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_4_3000.pth
+2023-04-25 21:02:35,487 INFO Step: 3000. Epoch: 4/50. Iteration: 501/625. Cls loss: 0.202. Reg loss: 2.062. Seg loss: 0.496. Total loss: 2.760
+2023-04-25 21:03:27,848 INFO Step: 3100. Epoch: 4/50. Iteration: 601/625. Cls loss: 0.204. Reg loss: 2.534. Seg loss: 0.820. Total loss: 3.558
+2023-04-25 21:03:38,293 INFO NOT Validating...
+2023-04-25 21:08:17,393 INFO Epoch 6/50
+2023-04-25 21:09:00,993 INFO Step: 3200. Epoch: 5/50. Iteration: 76/625. Cls loss: 0.191. Reg loss: 2.631. Seg loss: 0.470. Total loss: 3.293
+2023-04-25 21:09:53,228 INFO Step: 3300. Epoch: 5/50. Iteration: 176/625. Cls loss: 0.221. Reg loss: 2.556. Seg loss: 0.476. Total loss: 3.253
+2023-04-25 21:10:46,583 INFO Step: 3400. Epoch: 5/50. Iteration: 276/625. Cls loss: 0.216. Reg loss: 2.461. Seg loss: 0.557. Total loss: 3.234
+2023-04-25 21:11:40,124 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_5_3500.pth
+2023-04-25 21:11:40,429 INFO Step: 3500. Epoch: 5/50. Iteration: 376/625. Cls loss: 0.209. Reg loss: 2.189. Seg loss: 0.528. Total loss: 2.926
+2023-04-25 21:12:32,603 INFO Step: 3600. Epoch: 5/50. Iteration: 476/625. Cls loss: 0.202. Reg loss: 2.106. Seg loss: 0.586. Total loss: 2.894
+2023-04-25 21:13:26,723 INFO Step: 3700. Epoch: 5/50. Iteration: 576/625. Cls loss: 0.210. Reg loss: 2.552. Seg loss: 0.612. Total loss: 3.373
+2023-04-25 21:13:50,726 INFO NOT Validating...
+2023-04-25 21:18:27,714 INFO Epoch 7/50
+2023-04-25 21:18:58,769 INFO Step: 3800. Epoch: 6/50. Iteration: 51/625. Cls loss: 0.199. Reg loss: 2.331. Seg loss: 0.500. Total loss: 3.031
+2023-04-25 21:19:51,053 INFO Step: 3900. Epoch: 6/50. Iteration: 151/625. Cls loss: 0.222. Reg loss: 2.505. Seg loss: 0.550. Total loss: 3.277
+2023-04-25 21:20:44,739 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_6_4000.pth
+2023-04-25 21:20:45,027 INFO Step: 4000. Epoch: 6/50. Iteration: 251/625. Cls loss: 0.186. Reg loss: 1.725. Seg loss: 0.505. Total loss: 2.416
+2023-04-25 21:21:37,172 INFO Step: 4100. Epoch: 6/50. Iteration: 351/625. Cls loss: 0.173. Reg loss: 2.020. Seg loss: 0.530. Total loss: 2.722
+2023-04-25 21:22:30,395 INFO Step: 4200. Epoch: 6/50. Iteration: 451/625. Cls loss: 0.196. Reg loss: 2.348. Seg loss: 0.421. Total loss: 2.965
+2023-04-25 21:23:22,532 INFO Step: 4300. Epoch: 6/50. Iteration: 551/625. Cls loss: 0.210. Reg loss: 2.474. Seg loss: 0.536. Total loss: 3.220
+2023-04-25 21:24:00,428 INFO NOT Validating...
+2023-04-25 21:28:39,425 INFO Epoch 8/50
+2023-04-25 21:28:57,144 INFO Step: 4400. Epoch: 7/50. Iteration: 26/625. Cls loss: 0.199. Reg loss: 1.714. Seg loss: 0.415. Total loss: 2.328
+2023-04-25 21:29:48,915 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_7_4500.pth
+2023-04-25 21:29:49,184 INFO Step: 4500. Epoch: 7/50. Iteration: 126/625. Cls loss: 0.232. Reg loss: 3.079. Seg loss: 0.370. Total loss: 3.681
+2023-04-25 21:30:43,013 INFO Step: 4600. Epoch: 7/50. Iteration: 226/625. Cls loss: 0.214. Reg loss: 2.204. Seg loss: 0.350. Total loss: 2.769
+2023-04-25 21:31:35,343 INFO Step: 4700. Epoch: 7/50. Iteration: 326/625. Cls loss: 0.215. Reg loss: 2.429. Seg loss: 0.313. Total loss: 2.957
+2023-04-25 21:32:28,309 INFO Step: 4800. Epoch: 7/50. Iteration: 426/625. Cls loss: 0.186. Reg loss: 1.693. Seg loss: 0.403. Total loss: 2.282
+2023-04-25 22:01:41,589 INFO Step: 4900. Epoch: 7/50. Iteration: 526/625. Cls loss: 0.199. Reg loss: 2.104. Seg loss: 0.298. Total loss: 2.601
+2023-04-25 22:02:31,048 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_7_5000.pth
+2023-04-25 22:02:31,050 INFO NOT Validating...
+2023-04-25 22:07:07,945 INFO Epoch 9/50
+2023-04-25 22:07:13,318 INFO Step: 5000. Epoch: 8/50. Iteration: 1/625. Cls loss: 0.193. Reg loss: 1.947. Seg loss: 0.273. Total loss: 2.414
+2023-04-25 22:08:05,041 INFO Step: 5100. Epoch: 8/50. Iteration: 101/625. Cls loss: 0.161. Reg loss: 2.169. Seg loss: 0.331. Total loss: 2.661
+2023-04-25 22:08:59,343 INFO Step: 5200. Epoch: 8/50. Iteration: 201/625. Cls loss: 0.191. Reg loss: 1.831. Seg loss: 0.288. Total loss: 2.311
+2023-04-25 22:09:51,010 INFO Step: 5300. Epoch: 8/50. Iteration: 301/625. Cls loss: 0.192. Reg loss: 1.985. Seg loss: 0.239. Total loss: 2.416
+2023-04-25 22:10:44,656 INFO Step: 5400. Epoch: 8/50. Iteration: 401/625. Cls loss: 0.173. Reg loss: 2.536. Seg loss: 0.381. Total loss: 3.090
+2023-04-25 22:11:36,634 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_8_5500.pth
+2023-04-25 22:11:36,948 INFO Step: 5500. Epoch: 8/50. Iteration: 501/625. Cls loss: 0.189. Reg loss: 2.146. Seg loss: 0.312. Total loss: 2.646
+2023-04-25 22:12:30,002 INFO Step: 5600. Epoch: 8/50. Iteration: 601/625. Cls loss: 0.188. Reg loss: 2.004. Seg loss: 0.368. Total loss: 2.560
+2023-04-25 22:12:40,073 INFO NOT Validating...
+2023-04-25 22:17:16,652 INFO Epoch 10/50
+2023-04-25 22:18:00,538 INFO Step: 5700. Epoch: 9/50. Iteration: 76/625. Cls loss: 0.202. Reg loss: 2.190. Seg loss: 0.310. Total loss: 2.703
+2023-04-25 22:18:51,944 INFO Step: 5800. Epoch: 9/50. Iteration: 176/625. Cls loss: 0.182. Reg loss: 1.781. Seg loss: 0.311. Total loss: 2.274
+2023-04-25 22:19:45,628 INFO Step: 5900. Epoch: 9/50. Iteration: 276/625. Cls loss: 0.200. Reg loss: 2.320. Seg loss: 0.332. Total loss: 2.851
+2023-04-25 22:20:37,216 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_9_6000.pth
+2023-04-25 22:20:37,535 INFO Step: 6000. Epoch: 9/50. Iteration: 376/625. Cls loss: 0.177. Reg loss: 1.838. Seg loss: 0.324. Total loss: 2.339
+2023-04-25 22:21:31,004 INFO Step: 6100. Epoch: 9/50. Iteration: 476/625. Cls loss: 0.191. Reg loss: 2.141. Seg loss: 0.348. Total loss: 2.680
+2023-04-25 22:22:23,429 INFO Step: 6200. Epoch: 9/50. Iteration: 576/625. Cls loss: 0.187. Reg loss: 1.985. Seg loss: 0.287. Total loss: 2.459
+2023-04-25 22:22:47,482 INFO NOT Validating...
+2023-04-25 22:27:24,238 INFO Epoch 11/50
+2023-04-25 22:27:54,935 INFO Step: 6300. Epoch: 10/50. Iteration: 51/625. Cls loss: 0.196. Reg loss: 2.143. Seg loss: 0.328. Total loss: 2.668
+2023-04-25 22:28:47,189 INFO Step: 6400. Epoch: 10/50. Iteration: 151/625. Cls loss: 0.210. Reg loss: 2.574. Seg loss: 0.319. Total loss: 3.102
+2023-04-25 22:29:39,920 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_10_6500.pth
+2023-04-25 22:29:41,256 INFO Step: 6500. Epoch: 10/50. Iteration: 251/625. Cls loss: 0.201. Reg loss: 2.235. Seg loss: 0.375. Total loss: 2.811
+2023-04-25 22:30:33,193 INFO Step: 6600. Epoch: 10/50. Iteration: 351/625. Cls loss: 0.185. Reg loss: 2.190. Seg loss: 0.302. Total loss: 2.678
+2023-04-25 22:31:27,053 INFO Step: 6700. Epoch: 10/50. Iteration: 451/625. Cls loss: 0.228. Reg loss: 2.851. Seg loss: 0.277. Total loss: 3.356
+2023-04-25 22:32:18,704 INFO Step: 6800. Epoch: 10/50. Iteration: 551/625. Cls loss: 0.178. Reg loss: 1.533. Seg loss: 0.431. Total loss: 2.141
+2023-04-25 22:32:55,922 INFO NOT Validating...
+2023-04-26 00:46:32,461 INFO Epoch 12/50
+2023-04-26 00:46:50,517 INFO Step: 6900. Epoch: 11/50. Iteration: 26/625. Cls loss: 0.177. Reg loss: 2.216. Seg loss: 0.278. Total loss: 2.672
+2023-04-26 00:47:42,319 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_11_7000.pth
+2023-04-26 00:47:42,607 INFO Step: 7000. Epoch: 11/50. Iteration: 126/625. Cls loss: 0.197. Reg loss: 2.292. Seg loss: 0.234. Total loss: 2.723
+2023-04-26 00:48:36,678 INFO Step: 7100. Epoch: 11/50. Iteration: 226/625. Cls loss: 0.194. Reg loss: 2.095. Seg loss: 0.232. Total loss: 2.521
+2023-04-26 00:49:28,957 INFO Step: 7200. Epoch: 11/50. Iteration: 326/625. Cls loss: 0.172. Reg loss: 1.776. Seg loss: 0.187. Total loss: 2.135
+2023-04-26 00:50:22,950 INFO Step: 7300. Epoch: 11/50. Iteration: 426/625. Cls loss: 0.181. Reg loss: 1.668. Seg loss: 0.208. Total loss: 2.057
+2023-04-26 00:51:15,397 INFO Step: 7400. Epoch: 11/50. Iteration: 526/625. Cls loss: 0.180. Reg loss: 1.808. Seg loss: 0.250. Total loss: 2.238
+2023-04-26 00:52:06,987 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_11_7500.pth
+2023-04-26 00:52:06,988 INFO NOT Validating...
+2023-04-26 00:56:43,296 INFO Epoch 13/50
+2023-04-26 00:56:48,406 INFO Step: 7500. Epoch: 12/50. Iteration: 1/625. Cls loss: 0.187. Reg loss: 2.030. Seg loss: 0.225. Total loss: 2.442
+2023-04-26 00:57:40,797 INFO Step: 7600. Epoch: 12/50. Iteration: 101/625. Cls loss: 0.186. Reg loss: 2.246. Seg loss: 0.256. Total loss: 2.688
+2023-04-26 00:58:34,641 INFO Step: 7700. Epoch: 12/50. Iteration: 201/625. Cls loss: 0.182. Reg loss: 1.861. Seg loss: 0.261. Total loss: 2.304
+2023-04-26 00:59:27,044 INFO Step: 7800. Epoch: 12/50. Iteration: 301/625. Cls loss: 0.209. Reg loss: 2.320. Seg loss: 0.172. Total loss: 2.702
+2023-04-26 01:00:20,961 INFO Step: 7900. Epoch: 12/50. Iteration: 401/625. Cls loss: 0.170. Reg loss: 2.408. Seg loss: 0.257. Total loss: 2.835
+2023-04-26 01:01:12,822 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_12_8000.pth
+2023-04-26 01:01:13,099 INFO Step: 8000. Epoch: 12/50. Iteration: 501/625. Cls loss: 0.206. Reg loss: 2.228. Seg loss: 0.195. Total loss: 2.629
+2023-04-26 01:02:07,391 INFO Step: 8100. Epoch: 12/50. Iteration: 601/625. Cls loss: 0.213. Reg loss: 2.229. Seg loss: 0.263. Total loss: 2.705
+2023-04-26 01:02:17,752 INFO NOT Validating...
+2023-04-26 01:06:55,995 INFO Epoch 14/50
+2023-04-26 01:07:40,388 INFO Step: 8200. Epoch: 13/50. Iteration: 76/625. Cls loss: 0.168. Reg loss: 2.139. Seg loss: 0.248. Total loss: 2.556
+2023-04-26 01:08:33,003 INFO Step: 8300. Epoch: 13/50. Iteration: 176/625. Cls loss: 0.206. Reg loss: 1.746. Seg loss: 0.252. Total loss: 2.205
+2023-04-26 01:09:26,550 INFO Step: 8400. Epoch: 13/50. Iteration: 276/625. Cls loss: 0.184. Reg loss: 2.168. Seg loss: 0.222. Total loss: 2.574
+2023-04-26 01:10:17,920 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_13_8500.pth
+2023-04-26 01:10:18,212 INFO Step: 8500. Epoch: 13/50. Iteration: 376/625. Cls loss: 0.199. Reg loss: 2.305. Seg loss: 0.283. Total loss: 2.788
+2023-04-26 01:11:12,228 INFO Step: 8600. Epoch: 13/50. Iteration: 476/625. Cls loss: 0.187. Reg loss: 2.076. Seg loss: 0.214. Total loss: 2.477
+2023-04-26 01:12:03,928 INFO Step: 8700. Epoch: 13/50. Iteration: 576/625. Cls loss: 0.182. Reg loss: 2.199. Seg loss: 0.247. Total loss: 2.628
+2023-04-26 01:12:27,804 INFO NOT Validating...
+2023-04-26 02:46:24,914 INFO Epoch 15/50
+2023-04-26 02:46:55,632 INFO Step: 8800. Epoch: 14/50. Iteration: 51/625. Cls loss: 0.236. Reg loss: 2.451. Seg loss: 0.275. Total loss: 2.962
+2023-04-26 02:47:47,480 INFO Step: 8900. Epoch: 14/50. Iteration: 151/625. Cls loss: 0.217. Reg loss: 2.484. Seg loss: 0.238. Total loss: 2.939
+2023-04-26 02:48:40,729 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_14_9000.pth
+2023-04-26 02:48:41,097 INFO Step: 9000. Epoch: 14/50. Iteration: 251/625. Cls loss: 0.200. Reg loss: 1.891. Seg loss: 0.254. Total loss: 2.345
+2023-04-26 02:49:32,755 INFO Step: 9100. Epoch: 14/50. Iteration: 351/625. Cls loss: 0.187. Reg loss: 1.890. Seg loss: 0.220. Total loss: 2.297
+2023-04-26 02:50:26,522 INFO Step: 9200. Epoch: 14/50. Iteration: 451/625. Cls loss: 0.199. Reg loss: 2.756. Seg loss: 0.236. Total loss: 3.192
+2023-04-26 02:51:18,386 INFO Step: 9300. Epoch: 14/50. Iteration: 551/625. Cls loss: 0.191. Reg loss: 2.262. Seg loss: 0.241. Total loss: 2.694
+2023-04-26 02:51:56,043 INFO NOT Validating...
+2023-04-26 02:56:29,871 INFO Epoch 16/50
+2023-04-26 02:56:47,623 INFO Step: 9400. Epoch: 15/50. Iteration: 26/625. Cls loss: 0.193. Reg loss: 2.054. Seg loss: 0.225. Total loss: 2.472
+2023-04-26 02:57:39,469 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_amp/2023_0425_1848_35/checkpoints/hybridnets-d3_15_9500.pth
+2023-04-26 02:57:39,749 INFO Step: 9500. Epoch: 15/50. Iteration: 126/625. Cls loss: 0.199. Reg loss: 2.423. Seg loss: 0.211. Total loss: 2.833
+2023-04-26 02:58:32,147 INFO Step: 9600. Epoch: 15/50. Iteration: 226/625. Cls loss: 0.191. Reg loss: 1.873. Seg loss: 0.204. Total loss: 2.267
+2023-04-26 02:59:24,356 INFO Step: 9700. Epoch: 15/50. Iteration: 326/625. Cls loss: 0.175. Reg loss: 2.268. Seg loss: 0.170. Total loss: 2.613
+2023-04-26 03:00:15,830 INFO Step: 9800. Epoch: 15/50. Iteration: 426/625. Cls loss: 0.185. Reg loss: 2.236. Seg loss: 0.175. Total loss: 2.596

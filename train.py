@@ -9,6 +9,7 @@ from tensorboardX import SummaryWriter
 from torch import nn
 from torchvision import transforms
 from tqdm.autonotebook import tqdm
+import signal
 
 from val import val
 from backbone import HybridNetsBackbone
@@ -21,6 +22,23 @@ from hybridnets.model import ModelWithLoss
 from utils.constants import *
 from collections import OrderedDict
 from torchinfo import summary
+
+
+# Define a signal handler function
+def signal_handler(sig, frame):
+    signal_name = signal.Signals(sig).name
+    logging.error(f"Received signal: {signal_name} ({signal})")
+    # Perform any required actions or cleanup here
+    # ...
+    torch.cuda.empty_cache()
+    exit(1)
+
+# Register the signal handler for keyboard interruption (Ctrl+C)
+signal.signal(signal.SIGINT, signal_handler)
+
+# Register the signal handler for program termination signals
+signal.signal(signal.SIGTERM, signal_handler)
+
 
 
 def get_date_uid():
@@ -204,7 +222,7 @@ def train(opt):
             # last_epoch = step // num_iter_per_epoch
             # if epoch < last_epoch:
             #     continue
-            logging.info(f'Epoch {epoch + 1}/{opt.num_epochs}')
+            logging.info(f'Epoch {epoch}/{opt.num_epochs}')
             
             epoch_loss = []
             progress_bar = tqdm(training_generator, ascii=True)
@@ -249,6 +267,8 @@ def train(opt):
                     scaler.step(optimizer)
                     scaler.update()
 
+                    # torch.cuda.empty_cache()
+
                     epoch_loss.append(float(loss))
 
                     if step % 100 == 0 and step > 0:
@@ -274,8 +294,8 @@ def train(opt):
                         logging.info('Saved checkpoint to: ' + f'{opt.saved_path}/hybridnets-d{opt.compound_coef}_{epoch}_{step}.pth')
 
                 except Exception as e:
-                    logging.info('[Error]', traceback.format_exc())
-                    logging.info(e)
+                    logging.error('[Error]', traceback.format_exc())
+                    logging.error(e)
                     continue
 
             scheduler.step(np.mean(epoch_loss))
@@ -349,10 +369,16 @@ def get_args():
 if __name__ == '__main__':
     """
 
-    increased conf_thres to 0.5, because of issue (too high RAM memory, not related to GPU):
+    tried to increase conf_thres to 0.5, because of issue (too high RAM memory, not related to GPU):
     https://github.com/datvuthanh/HybridNets/issues/44
+    Still got killed at epoch 15.
 
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_amp -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a first_run_bdd10k_pretrained_bs_16_with_amp_freezed_backbone_conf_thres_0.5.txt & 
+    Tried --cal_map False, result: stopped at epoch 37
+    Tried no validating, result: stopped at epoch 37
+
+    Tried adding signal with --cal_map False, and trained only once at a time
+    
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_amp_no_cal_map_with_signal -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_amp_no_cal_map_with_signal.txt & 
     
     tensorboard --logdir=logs --port=6007
 

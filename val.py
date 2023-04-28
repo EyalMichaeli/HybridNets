@@ -3,6 +3,7 @@ import numpy as np
 import argparse
 from tqdm.autonotebook import tqdm
 import os
+import logging
 
 from utils import smp_metrics
 from utils.utils import ConfusionMatrix, postprocess, scale_coords, process_batch, ap_per_class, fitness, \
@@ -72,6 +73,7 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
         seg_loss = seg_loss.mean()
 
         if opt.cal_map:
+            logging.info('Calculating mAP...')
             out = postprocess(imgs.detach(),
                               torch.stack([anchors[0]] * imgs.shape[0], 0).detach(), regression.detach(),
                               classification.detach(),
