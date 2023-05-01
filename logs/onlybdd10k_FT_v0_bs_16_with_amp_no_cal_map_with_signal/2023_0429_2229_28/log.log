@@ -1,0 +1,12 @@
+2023-04-29 22:29:29,146 INFO Avaliable images: 70000
+2023-04-29 22:29:29,147 INFO Running on 10000 images
+2023-04-29 22:29:29,154 INFO building database...
+2023-04-29 22:29:50,229 INFO database build finish
+2023-04-29 22:29:50,229 INFO Not using MUNIT output
+2023-04-29 22:29:50,246 INFO Avaliable images: 10000
+2023-04-29 22:29:50,246 INFO Running on 10000 images
+2023-04-29 22:29:50,246 INFO building database...
+2023-04-29 22:29:52,038 INFO database build finish
+2023-04-29 22:29:52,039 INFO Not using MUNIT output
+2023-04-29 22:29:55,091 INFO [Info] Successfully!!!
+2023-04-29 22:29:55,157 INFO Epoch 1/50

@@ -1,8 +1,10 @@
+import os
 import cv2
 import numpy as np
 import logging
 # np.set_printoptions(threshold=np.inf)
 import random
+import glob
 import torch
 import torchvision.transforms as transforms
 from pathlib import Path
@@ -18,8 +20,9 @@ import torchshow
 
 AMOUNT_TO_RUN_ON = 10000
 
+
 class BddDataset(Dataset):
-    def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False, amount_to_run_on=AMOUNT_TO_RUN_ON):
+    def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False, amount_to_run_on=AMOUNT_TO_RUN_ON, munit_output_path=None):
         """
         initial all the characteristic
 
@@ -43,10 +46,17 @@ class BddDataset(Dataset):
             indicator = params.dataset['train_set']
         else:
             indicator = params.dataset['test_set']
+        # self.img_root = img_root / indicator.replace("train", "train_10k") / "images_a"     
         self.img_root = img_root / indicator / "images_a"     
 
         self.label_root = label_root / indicator
-        self.label_list = list(self.label_root.iterdir())
+
+        if munit_output_path:
+            images_names = os.listdir(munit_output_path)
+            self.label_list = [self.label_root / f"{name.split('_')[0]}.json" for name in images_names]
+        else:
+            self.label_list = sorted(list(self.label_root.iterdir()))
+
         if amount_to_run_on is not None:
             logging.info(f"Avaliable images: {len(self.label_list)}")
             logging.info(f"Running on {amount_to_run_on} images")
@@ -77,6 +87,12 @@ class BddDataset(Dataset):
         self.mosaic_border = [-1 * self.inputsize[1] // 2, -1 * self.inputsize[0] // 2]
         self.seg_mode = seg_mode
         self.db = self._get_db()
+        self.munit_output_path = munit_output_path
+        if self.munit_output_path:
+            logging.info(f"Using MUNIT output from {self.munit_output_path}")
+        else:
+            logging.info(f"Not using MUNIT output")
+
 
     def _get_db(self):
         """
@@ -162,7 +178,16 @@ class BddDataset(Dataset):
     def load_image(self, index):
         data = self.db[index]
         det_label = data["label"]
-        img = cv2.imread(data["image"], cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
+        image_path = data["image"]
+
+        if self.munit_output_path:
+            # change the path to same image after MUNIT output
+            image_name = image_path.split('/')[-1]
+            # choose randomly the name suffix for the file name
+            file_name_suffix = random.choice(['_0', '_1', '_2', '_3', '_4', '_source'])
+            image_path = str(Path(self.munit_output_path) / str(image_name.split('.')[0] + file_name_suffix + '.jpg'))
+
+        img = cv2.imread(image_path, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         # img = data["image"]
         seg_label = OrderedDict()

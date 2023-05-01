@@ -4,6 +4,7 @@ import argparse
 from tqdm.autonotebook import tqdm
 import os
 import logging
+import cv2
 
 from utils import smp_metrics
 from utils.utils import ConfusionMatrix, postprocess, scale_coords, process_batch, ap_per_class, fitness, \
@@ -18,7 +19,8 @@ from utils.constants import *
 
 
 @torch.no_grad()
-def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
+def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pred_output_dir, **kwargs):
+    """added tb_writer to write to tensorboard. not in use ATM"""
     model.eval()
 
     optimizer = kwargs.get('optimizer', None)
@@ -72,6 +74,61 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
         reg_loss = reg_loss.mean()
         seg_loss = seg_loss.mean()
 
+        # prepare vars for visualization
+        i = 0
+
+        img = imgs[i].cpu().numpy()
+
+        step = 0 if step is None else step
+
+        labels = annot[i]
+        labels = labels[labels[:, 4] != -1]
+
+        out = postprocess(imgs.detach(),
+                            torch.stack([anchors[0]] * imgs.shape[0], 0).detach(), regression.detach(),
+                            classification.detach(),
+                            regressBoxes, clipBoxes,
+                            opt.conf_thres, opt.iou_thres)  # 0.5, 0.3
+        
+        ou = out[i]
+        nl = len(labels)
+
+        pred = np.column_stack([ou['rois'], ou['scores']])
+        pred = np.column_stack([pred, ou['class_ids']])
+        pred = torch.from_numpy(pred).cuda()
+        # done with visualization vars
+
+        ### visualize bb
+        # img = cv2.imread('/mnt/raid/home/eyal_michaeli/datasets/bdd/bdd100k/val' + filenames[i],
+        #                         cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION | cv2.IMREAD_UNCHANGED)
+        for label in labels:
+            x1, y1, x2, y2 = [int(x) for x in label[:4]]
+            img = cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 1)
+        for pre in pred:
+            x1, y1, x2, y2 = [int(x) for x in pre[:4]]
+            img = cv2.putText(img, str(pre[4].cpu().numpy()), (x1 - 10, y1 - 10),
+                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+            img = cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
+
+        cv2.imwrite(f"{pred_output_dir}/pred+label-step_{step}-{i}.jpg", img)
+        print(pred_output_dir)
+        ### done visualize bb
+
+        # ### Visualization of seg
+        # seg_0 = segmentation[i]
+        # # logging.info('bbb', seg_0.shape)
+        # seg_0 = torch.argmax(seg_0, dim = 0)
+        # # logging.info('before', seg_0.shape)
+        # seg_0 = seg_0.cpu().numpy().transpose(1, 2, 0)
+        # # logging.info(seg_0.shape)
+        # anh = np.zeros((384,640,3)) 
+        # anh[seg_0 == 0] = (255,0,0)
+        # anh[seg_0 == 1] = (0,255,0)
+        # anh[seg_0 == 2] = (0,0,255)
+        # anh = np.uint8(anh)
+        # cv2.imwrite(f"{pred_output_dir}/segmentation-step_{step}-{i}.jpg", anh)    
+        # ### done visulize seg
+
         if opt.cal_map:
             logging.info('Calculating mAP...')
             out = postprocess(imgs.detach(),
@@ -98,24 +155,28 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
                     if nl:
                         stats.append((torch.zeros(0, num_thresholds, dtype=torch.bool),
                                       torch.Tensor(), torch.Tensor(), target_class))
-                    # print("here")
+                    # logging.info("here")
                     continue
 
                 if nl:
                     pred[:, :4] = scale_coords(imgs[i][1:], pred[:, :4], shapes[i][0], shapes[i][1])
                     labels = scale_coords(imgs[i][1:], labels, shapes[i][0], shapes[i][1])
-                    # ori_img = cv2.imread('datasets/bdd100k_effdet/val/' + filenames[i],
+
+                    # # visualize bb
+                    # img = cv2.imread('/mnt/raid/home/eyal_michaeli/datasets/bdd/bdd100k/val' + filenames[i],
                     #                      cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION | cv2.IMREAD_UNCHANGED)
                     # for label in labels:
                     #     x1, y1, x2, y2 = [int(x) for x in label[:4]]
-                    #     ori_img = cv2.rectangle(ori_img, (x1, y1), (x2, y2), (255, 0, 0), 1)
+                    #     img = cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 1)
                     # for pre in pred:
                     #     x1, y1, x2, y2 = [int(x) for x in pre[:4]]
-                    #     # ori_img = cv2.putText(ori_img, str(pre[4].cpu().numpy()), (x1 - 10, y1 - 10),
-                    #     #                       cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-                    #     ori_img = cv2.rectangle(ori_img, (x1, y1), (x2, y2), (0, 255, 0), 1)
+                    #     img = cv2.putText(img, str(pre[4].cpu().numpy()), (x1 - 10, y1 - 10),
+                    #                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+                    #     img = cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
 
-                    # cv2.imwrite('pre+label-{}.jpg'.format(filenames[i]), ori_img)
+                    # cv2.imwrite('pre+label-{}.jpg'.format(filenames[i]), img)
+                    # # done visualize bb
+
                     correct = process_batch(pred, labels, iou_thresholds)
                     if opt.plots:
                         confusion_matrix.process_batch(pred, labels)
@@ -123,22 +184,23 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
                     correct = torch.zeros(pred.shape[0], num_thresholds, dtype=torch.bool)
                 stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), target_class))
 
-                # print(stats)
+                # logging.info(stats)
 
-                # Visualization
+                # # Visualization of seg
                 # seg_0 = segmentation[i]
-                # # print('bbb', seg_0.shape)
+                # # logging.info('bbb', seg_0.shape)
                 # seg_0 = torch.argmax(seg_0, dim = 0)
-                # # print('before', seg_0.shape)
-                # seg_0 = seg_0.cpu().numpy()
-                #     #.transpose(1, 2, 0)
-                # # print(seg_0.shape)
+                # # logging.info('before', seg_0.shape)
+                # seg_0 = seg_0.cpu().numpy().transpose(1, 2, 0)
+                # # logging.info(seg_0.shape)
                 # anh = np.zeros((384,640,3))
                 # anh[seg_0 == 0] = (255,0,0)
                 # anh[seg_0 == 1] = (0,255,0)
                 # anh[seg_0 == 2] = (0,0,255)
                 # anh = np.uint8(anh)
-                # cv2.imwrite('segmentation-{}.jpg'.format(filenames[i]),anh)         
+                # cv2.imwrite('segmentation-{}.jpg'.format(filenames[i]),anh)       
+                # # done visulize seg
+
             if seg_mode == MULTICLASS_MODE:
                 segmentation = segmentation.log_softmax(dim=1).exp()
                 _, segmentation = torch.max(segmentation, 1)  # (bs, C, H, W) -> (bs, H, W)
@@ -149,7 +211,7 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
                                                                    threshold=0.5 if seg_mode != MULTICLASS_MODE else None,
                                                                    num_classes=ncs if seg_mode == MULTICLASS_MODE else None)
             iou = smp_metrics.iou_score(tp_seg, fp_seg, fn_seg, tn_seg, reduction='none')
-            #         print(iou)
+            #         logging.info(iou)
             acc = smp_metrics.balanced_accuracy(tp_seg, fp_seg, fn_seg, tn_seg, reduction='none')
 
             for i in range(ncs):
@@ -169,9 +231,9 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
     seg_loss = np.mean(loss_segmentation_ls)
     loss = cls_loss + reg_loss + seg_loss
 
-    print(
+    logging.info(
         'Val. Epoch: {}/{}. Classification loss: {:1.5f}. Regression loss: {:1.5f}. Segmentation loss: {:1.5f}. Total loss: {:1.5f}'.format(
-            epoch, opt.num_epochs if is_training else 0, cls_loss, reg_loss, seg_loss, loss))
+            epoch+1, opt.num_epochs if is_training else 0, cls_loss, reg_loss, seg_loss, loss))
     if is_training:
         writer.add_scalars('Loss', {'val': loss}, step)
         writer.add_scalars('Regression_loss', {'val': reg_loss}, step)
@@ -182,9 +244,9 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
         for i in range(ncs):
             iou_ls[i] = np.concatenate(iou_ls[i])
             acc_ls[i] = np.concatenate(acc_ls[i])
-        # print(len(iou_ls[0]))
+        # logging.info(len(iou_ls[0]))
         iou_score = np.mean(iou_ls)
-        # print(iou_score)
+        # logging.info(iou_score)
         acc_score = np.mean(acc_ls)
 
         miou_ls = []
@@ -201,7 +263,7 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
 
         # Compute statistics
         stats = [np.concatenate(x, 0) for x in zip(*stats)]
-        # print(stats[3])
+        # logging.info(stats[3])
 
         # Count detected boxes per class
         # boxes_per_class = np.bincount(stats[2].astype(np.int64), minlength=1)
@@ -220,19 +282,19 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
             nt = torch.zeros(1)
 
         # Print results
-        print(s_seg)
-        print(s)
+        logging.info(s_seg)
+        logging.info(s)
         pf = ('%-15s' + '%-11i' * 2 + '%-11.3g' * 6) % ('all', seen, nt.sum(), mp, mr, map50, map, iou_score, acc_score)
         for i in range(len(params.seg_list)):
             tmp = i+1 if seg_mode != BINARY_MODE else i
             pf += ('%-11.3g' * 3) % (miou_ls[i], iou_ls[tmp], acc_ls[tmp])
-        print(pf)
+        logging.info(pf)
 
         # Print results per class
         if opt.verbose and nc > 1 and len(stats):
             pf = '%-15s' + '%-11i' * 2 + '%-11.3g' * 4
             for i, c in enumerate(ap_class):
-                print(pf % (names[c], seen, nt[c], p[i], r[i], ap50[i], ap[i]))
+                logging.info(pf % (names[c], seen, nt[c], p[i], r[i], ap50[i], ap[i]))
 
         # Plots
         if opt.plots:
@@ -252,7 +314,7 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
                     'model': model.model.state_dict(),
                     'optimizer': optimizer.state_dict(),
                     'scaler': scaler.state_dict()}
-            print("Saving checkpoint with best fitness", fi[0])
+            logging.info("Saving checkpoint with best fitness", fi[0])
             save_checkpoint(ckpt, opt.saved_path, f'hybridnets-d{opt.compound_coef}_{epoch}_{step}_best.pth')
     else:
         # if not calculating map, save by best loss
@@ -264,7 +326,7 @@ def val(model, val_generator, params, opt, seg_mode, is_training, **kwargs):
 
     # Early stopping
     if is_training and epoch - best_epoch > opt.es_patience > 0:
-        print('[Info] Stop training at epoch {}. The lowest loss achieved is {}'.format(epoch, best_loss))
+        logging.info('[Info] Stop training at epoch {}. The lowest loss achieved is {}'.format(epoch, best_loss))
         exit(0)
 
     model.train()

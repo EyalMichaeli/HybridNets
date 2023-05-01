@@ -23,7 +23,7 @@ from utils.constants import *
 from collections import OrderedDict
 from torchinfo import summary
 
-
+num_error_signals = 0
 # Define a signal handler function
 def signal_handler(sig, frame):
     signal_name = signal.Signals(sig).name
@@ -31,7 +31,11 @@ def signal_handler(sig, frame):
     # Perform any required actions or cleanup here
     # ...
     torch.cuda.empty_cache()
-    exit(1)
+    global num_error_signals
+    num_error_signals += 1
+    if num_error_signals >= 2:
+        exit(1)
+    logging.info(f"Continuing training... num_error_signals = {num_error_signals}")
 
 # Register the signal handler for keyboard interruption (Ctrl+C)
 signal.signal(signal.SIGINT, signal_handler)
@@ -82,12 +86,16 @@ def train(opt):
 
     opt.log_path = init_logging(opt.log_path)
     opt.saved_path = opt.log_path + f'/checkpoints'
+    pred_output_dir = opt.log_path + f'/predictions/'
+
     opt.log_path = opt.log_path + f'/{opt.project}/tensorboard/'
     os.makedirs(opt.log_path, exist_ok=True)
     os.makedirs(opt.saved_path, exist_ok=True)
+    os.makedirs(pred_output_dir, exist_ok=True)
 
     seg_mode = MULTILABEL_MODE if params.seg_multilabel else MULTICLASS_MODE if len(params.seg_list) > 1 else BINARY_MODE
 
+    logging.info("Loading train dataset")
     train_dataset = BddDataset(
         params=params,
         is_train=True,
@@ -99,7 +107,8 @@ def train(opt):
             )
         ]),
         seg_mode=seg_mode,
-        debug=opt.debug
+        debug=opt.debug,
+        munit_output_path=opt.munit_path
     )
 
     training_generator = DataLoaderX(
@@ -111,6 +120,7 @@ def train(opt):
         collate_fn=BddDataset.collate_fn
     )
 
+    logging.info("Loading validation dataset")
     valid_dataset = BddDataset(
         params=params,
         is_train=False,
@@ -222,7 +232,7 @@ def train(opt):
             # last_epoch = step // num_iter_per_epoch
             # if epoch < last_epoch:
             #     continue
-            logging.info(f'Epoch {epoch}/{opt.num_epochs}')
+            logging.info(f'Epoch {epoch+1}/{opt.num_epochs}')
             
             epoch_loss = []
             progress_bar = tqdm(training_generator, ascii=True)
@@ -274,7 +284,7 @@ def train(opt):
                     if step % 100 == 0 and step > 0:
                         logging.info(
                             'Step: {}. Epoch: {}/{}. Iteration: {}/{}. Cls loss: {:.3f}. Reg loss: {:.3f}. Seg loss: {:.3f}. Total loss: {:.3f}'.format(
-                                step, epoch, opt.num_epochs, iter + 1, num_iter_per_epoch, cls_loss.float().item(),
+                                step, epoch+1, opt.num_epochs, iter + 1, num_iter_per_epoch, cls_loss.float().item(),
                                 reg_loss.item(), seg_loss.item(), loss.item()))
                         # writer.add_scalars('GPU_max_memory', {'train': torch.cuda.max_memory_allocated() / 1024 ** 3}, step)
                         # writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step)
@@ -301,9 +311,10 @@ def train(opt):
             scheduler.step(np.mean(epoch_loss))
 
             if epoch % opt.val_interval == 0:
-                logging.info('NOT Validating...')
-                best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, is_training=True,
-                                                          optimizer=optimizer, scaler=scaler, writer=writer, epoch=epoch, step=step, 
+                # logging.info('NOT Validating...')
+                logging.info('Validating...')
+                best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, tb_writer=writer, pred_output_dir=pred_output_dir,
+                                                          is_training=True, optimizer=optimizer, scaler=scaler, writer=writer, epoch=epoch, step=step, 
                                                           best_fitness=best_fitness, best_loss=best_loss, best_epoch=best_epoch)
     except KeyboardInterrupt:
         save_checkpoint(model, opt.saved_path, f'hybridnets-d{opt.compound_coef}_{epoch}_{step}.pth')
@@ -361,6 +372,8 @@ def get_args():
                         help='IoU threshold in NMS')
     parser.add_argument('--amp', type=boolean_string, default=False,
                         help='Automatic Mixed Precision training')
+    # munit output path
+    parser.add_argument('--munit_path', type=str, required=False, default=None)
 
     args = parser.parse_args()
     return args
@@ -376,13 +389,21 @@ if __name__ == '__main__':
     Tried --cal_map False, result: stopped at epoch 37
     Tried no validating, result: stopped at epoch 37
 
-    Tried adding signal with --cal_map False, and trained only once at a time
+    Tried adding signal with --cal_map False, and trained only once at a time, result: WORKED!
+
+    Tried adding signal with --cal_map False, result: works! (I think, smth is strange still- )
     
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_amp_no_cal_map_with_signal -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_amp_no_cal_map_with_signal.txt & 
+
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat.txt & 
     
+    # with MUNIT output
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --munit_path /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/ --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs.txt & 
+
     tensorboard --logdir=logs --port=6007
 
     """
+    # print pid
+    print('PID: ', os.getpid())
     opt = get_args()
     train(opt)
 
