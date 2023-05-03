@@ -1,0 +1,27 @@
+2023-05-03 10:44:13,556 INFO Loading train dataset
+2023-05-03 10:44:13,910 INFO Avaliable images: 60000
+2023-05-03 10:44:13,911 INFO Running on 10000 images
+2023-05-03 10:44:13,923 INFO building database...
+2023-05-03 10:44:15,827 INFO database build finish
+2023-05-03 10:44:15,827 INFO Using MUNIT output from /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/
+2023-05-03 10:44:15,829 INFO Loading validation dataset
+2023-05-03 10:44:15,888 INFO Avaliable images: 10000
+2023-05-03 10:44:15,888 INFO Running on 3300 images
+2023-05-03 10:44:15,889 INFO building database...
+2023-05-03 10:44:16,511 INFO database build finish
+2023-05-03 10:44:16,511 INFO Not using MUNIT output
+2023-05-03 10:44:19,108 INFO [Warning] Ignoring Error(s) in loading state_dict for HybridNetsBackbone:
+	size mismatch for classifier.header.pointwise_conv.conv.weight: copying a param with shape torch.Size([9, 160, 1, 1]) from checkpoint, the shape in current model is torch.Size([36, 160, 1, 1]).
+	size mismatch for classifier.header.pointwise_conv.conv.bias: copying a param with shape torch.Size([9]) from checkpoint, the shape in current model is torch.Size([36]).
+2023-05-03 10:44:19,109 INFO [Warning] Don't panic if you see this, this might be because you load a pretrained weights with different number of classes. The rest of the weights should be loaded already.
+2023-05-03 10:44:19,109 INFO [Info] Successfully!!!
+2023-05-03 10:44:19,199 INFO Epoch 1/50
+2023-05-03 10:45:37,589 INFO Step: 100. Epoch: 1/50. Iteration: 101/625. Cls loss: 2182.478. Reg loss: 3.319. Seg loss: 1.940. Total loss: 2187.737
+2023-05-03 10:46:45,986 INFO Step: 200. Epoch: 1/50. Iteration: 201/625. Cls loss: 1528.085. Reg loss: 3.473. Seg loss: 1.730. Total loss: 1533.288
+2023-05-03 10:47:52,361 INFO Step: 300. Epoch: 1/50. Iteration: 301/625. Cls loss: 910.463. Reg loss: 3.210. Seg loss: 2.070. Total loss: 915.743
+2023-05-03 10:48:59,484 INFO Step: 400. Epoch: 1/50. Iteration: 401/625. Cls loss: 835.668. Reg loss: 3.338. Seg loss: 1.786. Total loss: 840.791
+2023-05-03 10:50:04,358 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs/2023_0503_1044_13/checkpoints/hybridnets-d3_0_500.pth
+2023-05-03 10:50:04,687 INFO Step: 500. Epoch: 1/50. Iteration: 501/625. Cls loss: 1484.616. Reg loss: 2.941. Seg loss: 1.935. Total loss: 1489.492
+2023-05-03 10:51:12,535 INFO Step: 600. Epoch: 1/50. Iteration: 601/625. Cls loss: 1304.202. Reg loss: 3.497. Seg loss: 1.726. Total loss: 1309.425
+2023-05-03 10:51:25,474 INFO Validating...
+2023-05-03 10:51:25,483 INFO Calculating mAP... will take one hour or more...

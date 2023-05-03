@@ -300,7 +300,7 @@ def train(opt):
                         # writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step)
 
                     step += 1
-                    break
+
                     if step % opt.save_interval == 0 and step > 0:
                         writer.add_scalars('Loss', {'train': loss}, step)
                         writer.add_scalars('Regression_loss', {'train': reg_loss}, step)
@@ -320,9 +320,11 @@ def train(opt):
 
             scheduler.step(np.mean(epoch_loss))
 
-            opt.cal_map = True if epoch % opt.calc_mAP_interval == 0 else False
+
+            opt.cal_map = True if (epoch % opt.calc_mAP_interval == 0 and opt.cal_map) or epoch == opt.num_epochs else False  
+            # if opt.cal_map is False, then it wont calculate mAP. 
+            # it will always calculate mAP at the last epoch
             if epoch % opt.val_interval == 0:
-                # logging.info('NOT Validating...')
                 logging.info('Validating...')
                 best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, tb_writer=writer, pred_output_dir=pred_output_dir,
                                                           is_training=True, optimizer=optimizer, scaler=scaler, writer=writer, epoch=epoch, step=step, 
@@ -419,7 +421,7 @@ if __name__ == '__main__':
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --conf_thres 0.5 --munit_path /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/ --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs.txt & 
     
     # tensorboard:
-    tensorboard --logdir=logs --port=6007
+    tensorboard --logdir=logs --port=6008
 
     """
     # print pid

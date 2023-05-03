@@ -1,49 +1,0 @@
-nohup: ignoring input
-INFO:root:
-CUDNN VERSION: 8500
-
-INFO:root:Loading train dataset
-INFO:root:Avaliable images: 70000
-INFO:root:Running on 10000 images
-INFO:root:building database...
-PID:  831475
-  0%|          | 0/10000 [00:00<?, ?it/s]  0%|          | 0/10000 [00:00<?, ?it/s]
-Traceback (most recent call last):
-  File "train.py", line 417, in <module>
-    train(opt)
-  File "train.py", line 99, in train
-    train_dataset = BddDataset(
-  File "/mnt/raid/home/eyal_michaeli/git/HybridNets/hybridnets/dataset.py", line 89, in __init__
-    self.db = self._get_db()
-  File "/mnt/raid/home/eyal_michaeli/git/HybridNets/hybridnets/dataset.py", line 122, in _get_db
-    if len(self.obj_combine):  # multiple classes into 1 class
-TypeError: object of type 'NoneType' has no len()
-nohup: ignoring input
-INFO:root:
-CUDNN VERSION: 8500
-
-INFO:root:Loading train dataset
-INFO:root:Avaliable images: 70000
-INFO:root:Running on 10000 images
-INFO:root:building database...
-PID:  833234
-  0%|          | 0/10000 [00:00<?, ?it/s]  4%|4         | 416/10000 [00:00<00:02, 4154.27it/s]  8%|8         | 832/10000 [00:00<00:02, 3669.87it/s] 12%|#2        | 1203/10000 [00:00<00:02, 3336.24it/s] 15%|#5        | 1541/10000 [00:00<00:02, 3257.12it/s] 19%|#8        | 1869/10000 [00:00<00:02, 3124.54it/s] 22%|##1       | 2183/10000 [00:00<00:02, 3064.48it/s] 25%|##5       | 2548/10000 [00:00<00:02, 3241.93it/s] 30%|##9       | 2951/10000 [00:00<00:02, 3478.76it/s] 34%|###4      | 3440/10000 [00:00<00:01, 3902.45it/s] 40%|###9      | 3951/10000 [00:01<00:01, 4265.14it/s] 45%|####5     | 4510/10000 [00:01<00:01, 4662.05it/s] 50%|#####     | 5033/10000 [00:01<00:01, 4829.51it/s] 55%|#####5    | 5519/10000 [00:01<00:00, 4747.42it/s] 61%|######    | 6081/10000 [00:01<00:00, 5005.01it/s] 66%|######6   | 6629/10000 [00:01<00:00, 5144.44it/s] 71%|#######1  | 7145/10000 [00:01<00:00, 5138.56it/s] 77%|#######7  | 7708/10000 [00:01<00:00, 5283.28it/s] 83%|########2 | 8283/10000 [00:01<00:00, 5421.46it/s] 88%|########8 | 8843/10000 [00:01<00:00, 5473.78it/s] 94%|#########3| 9391/10000 [00:02<00:00, 5352.50it/s] 99%|#########9| 9928/10000 [00:02<00:00, 4690.62it/s]100%|##########| 10000/10000 [00:02<00:00, 4426.62it/s]
-INFO:root:database build finish
-INFO:root:Not using MUNIT output
-INFO:root:Loading validation dataset
-INFO:root:Avaliable images: 10000
-INFO:root:Running on 10000 images
-INFO:root:building database...
-  0%|          | 0/10000 [00:00<?, ?it/s]  6%|5         | 567/10000 [00:00<00:01, 5666.53it/s] 11%|#1        | 1141/10000 [00:00<00:01, 5705.68it/s] 17%|#7        | 1712/10000 [00:00<00:01, 5680.57it/s] 23%|##2       | 2281/10000 [00:00<00:01, 5425.46it/s] 28%|##8       | 2826/10000 [00:00<00:01, 5403.28it/s] 34%|###3      | 3368/10000 [00:00<00:01, 5403.71it/s] 39%|###9      | 3910/10000 [00:00<00:01, 5394.40it/s] 44%|####4     | 4450/10000 [00:00<00:01, 5310.17it/s] 50%|####9     | 4998/10000 [00:00<00:00, 5360.20it/s] 56%|#####5    | 5550/10000 [00:01<00:00, 5408.22it/s] 61%|######    | 6092/10000 [00:01<00:00, 5293.60it/s] 66%|######6   | 6623/10000 [00:01<00:00, 4724.74it/s] 71%|#######1  | 7107/10000 [00:01<00:00, 4481.16it/s] 77%|#######6  | 7665/10000 [00:01<00:00, 4775.09it/s] 82%|########2 | 8223/10000 [00:01<00:00, 4998.22it/s] 88%|########7 | 8790/10000 [00:01<00:00, 5186.97it/s] 94%|#########3| 9367/10000 [00:01<00:00, 5352.87it/s] 99%|#########9| 9915/10000 [00:01<00:00, 5389.36it/s]100%|##########| 10000/10000 [00:01<00:00, 5241.67it/s]
-INFO:root:database build finish
-INFO:root:Not using MUNIT output
-INFO:root:[Warning] Ignoring Error(s) in loading state_dict for HybridNetsBackbone:
-	size mismatch for classifier.header.pointwise_conv.conv.weight: copying a param with shape torch.Size([9, 160, 1, 1]) from checkpoint, the shape in current model is torch.Size([36, 160, 1, 1]).
-	size mismatch for classifier.header.pointwise_conv.conv.bias: copying a param with shape torch.Size([9]) from checkpoint, the shape in current model is torch.Size([36]).
-INFO:root:[Warning] Don't panic if you see this, this might be because you load a pretrained weights with different number of classes. The rest of the weights should be loaded already.
-INFO:root:[Info] Successfully!!!
-INFO:root:Epoch 1/50
-  0%|          | 0/625 [00:00<?, ?it/s]  0%|          | 0/625 [00:20<?, ?it/s]
-INFO:root:Validating...
-INFO:root:Calculating mAP... will take one hour
-  0%|          | 0/625 [00:00<?, ?it/s]  0%|          | 1/625 [00:28<5:00:32, 28.90s/it]  0%|          | 2/625 [00:48<4:00:20, 23.15s/it]  0%|          | 3/625 [01:06<3:39:46, 21.20s/it]  1%|          | 4/625 [01:25<3:27:13, 20.02s/it]  1%|          | 5/625 [01:42<3:17:49, 19.14s/it]  1%|          | 6/625 [02:00<3:12:51, 18.69s/it]  1%|1         | 7/625 [02:19<3:13:31, 18.79s/it]  1%|1         | 8/625 [02:37<3:09:18, 18.41s/it]  1%|1         | 9/625 [02:54<3:06:53, 18.20s/it]  2%|1         | 10/625 [03:12<3:03:52, 17.94s/it]  2%|1         | 11/625 [03:30<3:05:12, 18.10s/it]  2%|1         | 12/625 [03:48<3:04:40, 18.08s/it]  2%|2         | 13/625 [04:06<3:03:00, 17.94s/it]  2%|2         | 14/625 [04:24<3:02:14, 17.90s/it]  2%|2         | 15/625 [04:42<3:01:54, 17.89s/it]  3%|2         | 16/625 [05:00<3:02:02, 17.94s/it]  3%|2         | 17/625 [05:17<3:00:55, 17.85s/it]  3%|2         | 18/625 [05:35<2:59:23, 17.73s/it]  3%|3         | 19/625 [05:53<3:00:02, 17.83s/it]  3%|3         | 20/625 [06:10<2:58:53, 17.74s/it]  3%|3         | 21/625 [06:28<2:59:08, 17.80s/it]  4%|3         | 22/625 [06:47<3:01:42, 18.08s/it]  4%|3         | 23/625 [07:05<3:00:45, 18.02s/it]  4%|3         | 24/625 [07:25<3:06:51, 18.65s/it]  4%|4         | 25/625 [07:50<3:26:46, 20.68s/it]  4%|4         | 26/625 [08:16<3:42:04, 22.24s/it]  4%|4         | 27/625 [08:41<3:49:12, 23.00s/it]  4%|4         | 28/625 [09:03<3:45:20, 22.65s/it]
