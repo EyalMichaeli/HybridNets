@@ -54,6 +54,9 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
     regressBoxes = BBoxTransform()
     clipBoxes = ClipBoxes()
 
+    if opt.cal_map:
+        logging.info('Calculating mAP... will take one hour')
+        
     val_loader = tqdm(val_generator, ascii=True)
     for iter, data in enumerate(val_loader):
         imgs = data['img']
@@ -111,7 +114,6 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
             img = cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
 
         cv2.imwrite(f"{pred_output_dir}/pred+label-step_{step}-{i}.jpg", img)
-        print(pred_output_dir)
         ### done visualize bb
 
         # ### Visualization of seg
@@ -130,7 +132,6 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
         # ### done visulize seg
 
         if opt.cal_map:
-            logging.info('Calculating mAP...')
             out = postprocess(imgs.detach(),
                               torch.stack([anchors[0]] * imgs.shape[0], 0).detach(), regression.detach(),
                               classification.detach(),

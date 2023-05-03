@@ -1,0 +1,4 @@
+2023-05-03 10:17:11,586 INFO Loading train dataset
+2023-05-03 10:17:12,925 INFO Avaliable images: 70000
+2023-05-03 10:17:12,925 INFO Running on 10000 images
+2023-05-03 10:17:12,955 INFO building database...

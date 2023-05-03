@@ -1,0 +1,37 @@
+2023-05-01 15:19:51,793 INFO Loading train dataset
+2023-05-01 15:19:52,088 INFO Avaliable images: 60000
+2023-05-01 15:19:52,088 INFO Running on 10000 images
+2023-05-01 15:19:52,097 INFO building database...
+2023-05-01 15:19:54,189 INFO database build finish
+2023-05-01 15:19:54,189 INFO Using MUNIT output from /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/
+2023-05-01 15:19:54,191 INFO Loading validation dataset
+2023-05-01 15:19:54,259 INFO Avaliable images: 10000
+2023-05-01 15:19:54,259 INFO Running on 10000 images
+2023-05-01 15:19:54,260 INFO building database...
+2023-05-01 15:19:56,143 INFO database build finish
+2023-05-01 15:19:56,143 INFO Not using MUNIT output
+2023-05-01 15:19:58,452 INFO [Info] Successfully!!!
+2023-05-01 15:19:58,525 INFO Epoch 1/50
+2023-05-01 15:21:11,269 INFO Step: 100. Epoch: 1/50. Iteration: 101/625. Cls loss: 0.256. Reg loss: 3.434. Seg loss: 1.731. Total loss: 5.421
+2023-05-01 15:22:12,729 INFO Step: 200. Epoch: 1/50. Iteration: 201/625. Cls loss: 0.265. Reg loss: 3.459. Seg loss: 1.515. Total loss: 5.239
+2023-05-01 15:23:11,319 INFO Step: 300. Epoch: 1/50. Iteration: 301/625. Cls loss: 0.212. Reg loss: 2.359. Seg loss: 1.904. Total loss: 4.476
+2023-05-01 15:24:11,657 INFO Step: 400. Epoch: 1/50. Iteration: 401/625. Cls loss: 0.273. Reg loss: 2.772. Seg loss: 1.554. Total loss: 4.600
+2023-05-01 15:25:10,081 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs/2023_0501_1519_51/checkpoints/hybridnets-d3_0_500.pth
+2023-05-01 15:25:10,371 INFO Step: 500. Epoch: 1/50. Iteration: 501/625. Cls loss: 0.224. Reg loss: 2.635. Seg loss: 1.640. Total loss: 4.500
+2023-05-01 15:26:10,237 INFO Step: 600. Epoch: 1/50. Iteration: 601/625. Cls loss: 0.291. Reg loss: 3.401. Seg loss: 1.430. Total loss: 5.122
+2023-05-01 15:26:21,542 INFO Validating...
+2023-05-01 16:09:23,218 INFO Val. Epoch: 1/50. Classification loss: 0.24107. Regression loss: 3.00720. Segmentation loss: 1.68322. Total loss: 4.93149
+2023-05-01 16:09:23,382 INFO Epoch 2/50
+2023-05-01 16:10:12,083 INFO Step: 700. Epoch: 2/50. Iteration: 76/625. Cls loss: 0.273. Reg loss: 3.141. Seg loss: 1.062. Total loss: 4.476
+2023-05-01 16:11:10,425 INFO Step: 800. Epoch: 2/50. Iteration: 176/625. Cls loss: 0.251. Reg loss: 3.390. Seg loss: 1.191. Total loss: 4.833
+2023-05-01 16:12:10,310 INFO Step: 900. Epoch: 2/50. Iteration: 276/625. Cls loss: 0.258. Reg loss: 3.638. Seg loss: 1.315. Total loss: 5.210
+2023-05-01 16:13:07,348 INFO Saved checkpoint to: ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs/2023_0501_1519_51/checkpoints/hybridnets-d3_1_1000.pth
+2023-05-01 16:13:08,157 INFO Step: 1000. Epoch: 2/50. Iteration: 376/625. Cls loss: 0.225. Reg loss: 2.309. Seg loss: 1.531. Total loss: 4.065
+2023-05-01 16:14:06,990 INFO Step: 1100. Epoch: 2/50. Iteration: 476/625. Cls loss: 0.281. Reg loss: 2.583. Seg loss: 1.299. Total loss: 4.163
+2023-05-01 16:15:06,944 INFO Step: 1200. Epoch: 2/50. Iteration: 576/625. Cls loss: 0.206. Reg loss: 2.770. Seg loss: 1.059. Total loss: 4.035
+2023-05-01 16:15:31,366 INFO Validating...
+2023-05-02 12:11:34,216 ERROR Received signal: SIGTERM (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-02 12:11:34,473 INFO Continuing training... num_error_signals = 1
+2023-05-02 12:11:56,924 ERROR Received signal: SIGTERM (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-02 12:12:00,819 ERROR Received signal: SIGTERM (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-02 12:12:01,503 ERROR Received signal: SIGTERM (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)

@@ -290,7 +290,7 @@ def train(opt):
                         # writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step)
 
                     step += 1
-
+                    break
                     if step % opt.save_interval == 0 and step > 0:
                         writer.add_scalars('Loss', {'train': loss}, step)
                         writer.add_scalars('Regression_loss', {'train': reg_loss}, step)
@@ -310,6 +310,7 @@ def train(opt):
 
             scheduler.step(np.mean(epoch_loss))
 
+            opt.cal_map = True if epoch % opt.calc_mAP_interval == 0 else False
             if epoch % opt.val_interval == 0:
                 # logging.info('NOT Validating...')
                 logging.info('Validating...')
@@ -374,6 +375,7 @@ def get_args():
                         help='Automatic Mixed Precision training')
     # munit output path
     parser.add_argument('--munit_path', type=str, required=False, default=None)
+    parser.add_argument('--calc_mAP_interval', type=int, default=10, help='Number of epoches between calculating mAP')
 
     args = parser.parse_args()
     return args
@@ -382,23 +384,30 @@ def get_args():
 if __name__ == '__main__':
     """
 
-    tried to increase conf_thres to 0.5, because of issue (too high RAM memory, not related to GPU):
-    https://github.com/datvuthanh/HybridNets/issues/44
-    Still got killed at epoch 15.
-
+    tried to increase conf_thres to 0.5, because of issue (too high RAM memory, not related to GPU): https://github.com/datvuthanh/HybridNets/issues/44, 
+        Still got killed at epoch 15.
     Tried --cal_map False, result: stopped at epoch 37
     Tried no validating, result: stopped at epoch 37
-
     Tried adding signal with --cal_map False, and trained only once at a time, result: WORKED!
-
     Tried adding signal with --cal_map False, result: works! (I think, smth is strange still- )
-    
+    Tried with cal map but with conf_thresh 0.5, result: works!
 
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat.txt & 
+    Notes:
+    1. Note that validation on the 10k (size of val for BDD) takes one hour (!).
+
+    # with mAP:
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP.txt & 
     
-    # with MUNIT output
+    # no mAP:
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes.txt & 
+    
+    # with MUNIT output, no mAP:
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --munit_path /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/ --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs.txt & 
 
+    # with MUNIT output, with mAP:
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --conf_thres 0.5 --munit_path /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/ --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs.txt & 
+    
+    # tensorboard:
     tensorboard --logdir=logs --port=6007
 
     """
