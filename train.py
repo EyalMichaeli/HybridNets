@@ -23,6 +23,14 @@ from utils.constants import *
 from collections import OrderedDict
 from torchinfo import summary
 
+
+AMOUNT_TO_RUN_TRAIN_ON = 10000
+AMOUNT_TO_RUN_VAL_ON = 3300
+
+
+
+
+
 num_error_signals = 0
 # Define a signal handler function
 def signal_handler(sig, frame):
@@ -108,7 +116,8 @@ def train(opt):
         ]),
         seg_mode=seg_mode,
         debug=opt.debug,
-        munit_output_path=opt.munit_path
+        munit_output_path=opt.munit_path,
+        amount_to_run_on=AMOUNT_TO_RUN_TRAIN_ON
     )
 
     training_generator = DataLoaderX(
@@ -132,7 +141,8 @@ def train(opt):
             )
         ]),
         seg_mode=seg_mode,
-        debug=opt.debug
+        debug=opt.debug,
+        amount_to_run_on=AMOUNT_TO_RUN_VAL_ON
     )
 
     val_generator = DataLoaderX(
@@ -393,7 +403,8 @@ if __name__ == '__main__':
     Tried with cal map but with conf_thresh 0.5, result: works!
 
     Notes:
-    1. Note that validation on the 10k (size of val for BDD) takes one hour (!).
+    1. Note that validation on the 10k (size of val for BDD) on one class (car) takes one hour (!) or 15s per iter.
+    2. Note that validation on the 30% of the 10k (size of val for BDD) on the 4 car classes (car, truck, bus, train) takes 1 hours (!) or 30s per iter.
 
     # with mAP:
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP.txt & 

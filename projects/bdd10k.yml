@@ -15,9 +15,11 @@ anchors_ratios: '[(0.62, 1.58), (1.0, 1.0), (1.58, 0.62)]'
 
 # BDD100K officially supports 10 classes
 # obj_list: ['person', 'rider', 'car', 'truck', 'bus', 'train', 'motorcycle', 'bicycle', 'traffic light', 'traffic sign']
-obj_list: ['car']
-# obj_list: ['car', 'bus', 'truck', 'train']
-obj_combine: ['car', 'bus', 'truck', 'train']  # if single class, combine these classes into 1 single class in obj_list
+
+obj_list: ['car', 'bus', 'truck', 'train']
+obj_combine: []
+# obj_list: ['car']
+# obj_combine: ['car', 'bus', 'truck', 'train']  # if single class, combine these classes into 1 single class in obj_list
                                                # leave as empty list ([]) to not combine classes
 
 

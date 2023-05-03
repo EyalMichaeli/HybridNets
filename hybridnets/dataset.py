@@ -18,11 +18,10 @@ from utils.constants import *
 import torchshow
 
 
-AMOUNT_TO_RUN_ON = 10000
-
 
 class BddDataset(Dataset):
-    def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False, amount_to_run_on=AMOUNT_TO_RUN_ON, munit_output_path=None):
+    def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False, amount_to_run_on=None, 
+                 munit_output_path=None):
         """
         initial all the characteristic
 
@@ -30,7 +29,8 @@ class BddDataset(Dataset):
         -params: configuration parameters
         -is_train(bool): whether train set or not
         -transform: ToTensor and Normalize
-
+        -seg_mode: segmentation mode
+        -debug: whether debug or not
         Returns:
         None
         """

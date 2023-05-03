@@ -55,7 +55,7 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
     clipBoxes = ClipBoxes()
 
     if opt.cal_map:
-        logging.info('Calculating mAP... will take one hour')
+        logging.info('Calculating mAP... will take one hour or more...')
         
     val_loader = tqdm(val_generator, ascii=True)
     for iter, data in enumerate(val_loader):
