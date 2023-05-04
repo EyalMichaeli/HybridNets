@@ -280,3 +280,4 @@
 2023-05-04 20:55:50,484 INFO Epoch 26/50
 2023-05-04 20:57:31,633 INFO Step: 15700. Epoch: 26/50. Iteration: 76/625. Cls loss: 484.118. Reg loss: 2.566. Seg loss: 0.273. Total loss: 486.956
 2023-05-04 20:59:29,096 INFO Step: 15800. Epoch: 26/50. Iteration: 176/625. Cls loss: 992.433. Reg loss: 2.834. Seg loss: 0.320. Total loss: 995.587
+2023-05-04 21:01:33,078 INFO Step: 15900. Epoch: 26/50. Iteration: 276/625. Cls loss: 641.783. Reg loss: 1.756. Seg loss: 0.257. Total loss: 643.796

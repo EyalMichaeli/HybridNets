@@ -33,6 +33,7 @@ seg_list: ['road',
 seg_multilabel: false  # a pixel can belong to multiple labels (i.e. lane line + underlying road)
 
 dataset:
+  train_txt: /mnt/raid/home/eyal_michaeli/datasets/bdd/file_paths_txt/10.0k_images_duplicated_bus_3_train_3_truck_3.txt
   dataroot: /mnt/raid/home/eyal_michaeli/datasets/bdd/bdd100k/
   labelroot: /mnt/raid/home/eyal_michaeli/datasets/bdd/det_gt_downloaded_from_repo/
   segroot:

@@ -23,7 +23,7 @@ IMG_ROOT_FOLDER_NAME = "images_a"
 
 class BddDataset(Dataset):
     def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False,
-                 munit_output_path=None, paths_list_file=None):
+                 munit_output_path=None, paths_list_file=None, amount_to_run_on=None):
         """
         initial all the characteristic
 
@@ -35,6 +35,7 @@ class BddDataset(Dataset):
         -debug: whether debug or not
         -munit_output_path: path to munit output
         -paths_list_file: path to file containing paths to images
+        -amount_to_run_on: number of images to use
         Returns:
         None
         """
@@ -56,20 +57,25 @@ class BddDataset(Dataset):
         self.label_root = label_root / indicator
 
         if paths_list_file:
+            logging.info(f"Using paths list file: {paths_list_file}")
             with open(paths_list_file, 'r') as f:
-                self.image_list = [Path(line.strip()) for line in f.readlines()]
+                self.image_list = [line.strip() for line in f.readlines()]
 
         elif munit_output_path:
             images_names = os.listdir(munit_output_path)
             self.image_list = [self.img_root / f"{name.split('_')[0]}.jpg" for name in images_names]
             
         else:
-            self.image_list = sorted(list(self.img_root.iterdir()))
+            self.image_list = sorted([str(path) for path in list(self.img_root.iterdir())])
 
-        logging.info(f"Number of avaliable images: {len(self.label_list)}")
+        logging.info(f"Number of avaliable images: {len(self.image_list)}")
 
+        if amount_to_run_on:
+            self.image_list = self.image_list[:amount_to_run_on]
+            logging.warning(f"Using {amount_to_run_on} images")
+        
         if debug:
-            self.label_list = self.label_list[:50]
+            self.image_list = self.image_list[:50]
         self.seg_root = []
         for root in seg_root:
             self.seg_root.append(Path(root) / indicator)
@@ -183,7 +189,7 @@ class BddDataset(Dataset):
     def load_image(self, index):
         data = self.db[index]
         det_label = data["label"]
-        image_path = data["image"]
+        image_path = str(data["image"])
 
         if self.munit_output_path:
             # change the path to same image after MUNIT output

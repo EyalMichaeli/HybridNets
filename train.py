@@ -25,7 +25,6 @@ from collections import OrderedDict
 from torchinfo import summary
 
 
-AMOUNT_TO_RUN_TRAIN_ON = 10000
 AMOUNT_TO_RUN_VAL_ON = 3300
 
 
@@ -107,6 +106,8 @@ def train(opt):
 
     seg_mode = MULTILABEL_MODE if params.seg_multilabel else MULTICLASS_MODE if len(params.seg_list) > 1 else BINARY_MODE
 
+    train_txt = params.dataset['train_txt']
+
     logging.info("Loading train dataset")
     train_dataset = BddDataset(
         params=params,
@@ -121,7 +122,7 @@ def train(opt):
         seg_mode=seg_mode,
         debug=opt.debug,
         munit_output_path=opt.munit_path,
-        amount_to_run_on=AMOUNT_TO_RUN_TRAIN_ON
+        paths_list_file=train_txt,
     )
 
     training_generator = DataLoaderX(
@@ -307,7 +308,7 @@ def train(opt):
 
                     step += 1
 
-                    # break # only train one batch for debugging
+                    break # only train one batch for debugging
                     
                     if step % opt.save_interval == 0 and step > 0:
                         writer.add_scalars('Loss', {'train': loss}, step)
@@ -396,7 +397,7 @@ def get_args():
     # munit output path
     parser.add_argument('--munit_path', type=str, required=False, default=None)
     parser.add_argument('--calc_mAP_interval', type=int, default=10, help='Number of epoches between calculating mAP')
-
+    # add argument for txt file of file paths
     args = parser.parse_args()
     return args
 
@@ -419,9 +420,11 @@ if __name__ == '__main__':
     # with mAP:
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP.txt & 
     
+
     # no mAP:
     (--conf_thres 0.5 is needed because we calculate mAP on the last epoch)
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=0 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes_ends_with_mAP -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes_ends_with_mAP.txt & 
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=1 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_duplicated_bus_3_train_3_truck_3 -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_duplicated_bus_3_train_3_truck_3.txt & 
+
     
     # for debugging
     nohup sh -c 'CUDA_VISIBLE_DEVICES=0 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/debugging -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a debugging.txt & 
