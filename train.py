@@ -93,14 +93,17 @@ def train(opt):
     else:
         torch.manual_seed(42)
 
-    opt.log_path = init_logging(opt.log_path)
-    opt.saved_path = opt.log_path + f'/checkpoints'
-    pred_output_dir = opt.log_path + f'/predictions/'
+    opt.log_dir_path = init_logging(opt.log_path)
+    opt.saved_path = opt.log_dir_path + f'/checkpoints'
+    pred_output_dir = opt.log_dir_path + f'/predictions/'
 
-    opt.log_path = opt.log_path + f'/{opt.project}/tensorboard/'
+    opt.log_path = opt.log_dir_path + f'/{opt.project}/tensorboard/'
     os.makedirs(opt.log_path, exist_ok=True)
     os.makedirs(opt.saved_path, exist_ok=True)
     os.makedirs(pred_output_dir, exist_ok=True)
+
+    # copy the config file of the project to the log dir
+    os.system(f'cp projects/{opt.project}.yml {opt.log_dir_path}')
 
     seg_mode = MULTILABEL_MODE if params.seg_multilabel else MULTICLASS_MODE if len(params.seg_list) > 1 else BINARY_MODE
 
@@ -304,6 +307,8 @@ def train(opt):
 
                     step += 1
 
+                    # break # only train one batch for debugging
+                    
                     if step % opt.save_interval == 0 and step > 0:
                         writer.add_scalars('Loss', {'train': loss}, step)
                         writer.add_scalars('Regression_loss', {'train': reg_loss}, step)
@@ -416,7 +421,10 @@ if __name__ == '__main__':
     
     # no mAP:
     (--conf_thres 0.5 is needed because we calculate mAP on the last epoch)
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=1 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes_ends_with_mAP -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes_ends_with_mAP.txt & 
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=0 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes_ends_with_mAP -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes_ends_with_mAP.txt & 
+    
+    # for debugging
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=0 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/debugging -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a debugging.txt & 
     
     # with MUNIT output, no mAP:
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --munit_path /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/ --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs.txt & 

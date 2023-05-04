@@ -29,7 +29,6 @@ normalization_stats = {
 }
 
 def denormalize(img):
-    img = img.cpu().numpy()
     img = np.transpose(img, (1, 2, 0))
     img = img * normalization_stats["std"] + normalization_stats["mean"]
     img = np.clip(img, 0, 1)
@@ -128,19 +127,12 @@ def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_di
             ### visualize bb
             # img = cv2.imread('/mnt/raid/home/eyal_michaeli/datasets/bdd/bdd100k/val' + filenames[i],
             #                         cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION | cv2.IMREAD_UNCHANGED)
-            for label in labels:
-                x1, y1, x2, y2 = [int(x) for x in label[:4]]
-                img = cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 1)
-            for pre in pred:
-                x1, y1, x2, y2 = [int(x) for x in pre[:4]]
-                img = cv2.putText(img, str(pre[4].cpu().numpy()), (x1 - 10, y1 - 10),
-                                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-                img = cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
 
-            img = denormalize(img)
-            img = np.transpose(img, (1, 2, 0))
-            img = np.clip(img * 255, 0, 255).astype(np.uint8)
-            Image.fromarray(img).save(f"{pred_output_dir}/pred+label-step_{step}-{iter}.jpg")
+            # this is what I added:
+            # img = denormalize(img)
+            # img = np.transpose(img, (1, 2, 0))
+            # img = np.clip(img * 255, 0, 255).astype(np.uint8)
+            # Image.fromarray(img).save(f"{pred_output_dir}/pred+label-step_{step}-{iter}.jpg")
 
             ### done visualize bb
 

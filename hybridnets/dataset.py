@@ -18,10 +18,12 @@ from utils.constants import *
 import torchshow
 
 
+IMG_ROOT_FOLDER_NAME = "images_a"
+# IMG_ROOT_FOLDER_NAME = "images_a_extra_5_more_car_classes"
 
 class BddDataset(Dataset):
-    def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False, amount_to_run_on=None, 
-                 munit_output_path=None):
+    def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False,
+                 munit_output_path=None, paths_list_file=None):
         """
         initial all the characteristic
 
@@ -31,6 +33,8 @@ class BddDataset(Dataset):
         -transform: ToTensor and Normalize
         -seg_mode: segmentation mode
         -debug: whether debug or not
+        -munit_output_path: path to munit output
+        -paths_list_file: path to file containing paths to images
         Returns:
         None
         """
@@ -47,20 +51,22 @@ class BddDataset(Dataset):
         else:
             indicator = params.dataset['test_set']
         # self.img_root = img_root / indicator.replace("train", "train_10k") / "images_a"     
-        self.img_root = img_root / indicator / "images_a"     
+        self.img_root = img_root / indicator / IMG_ROOT_FOLDER_NAME  
 
         self.label_root = label_root / indicator
 
-        if munit_output_path:
-            images_names = os.listdir(munit_output_path)
-            self.label_list = [self.label_root / f"{name.split('_')[0]}.json" for name in images_names]
-        else:
-            self.label_list = sorted(list(self.label_root.iterdir()))
+        if paths_list_file:
+            with open(paths_list_file, 'r') as f:
+                self.image_list = [Path(line.strip()) for line in f.readlines()]
 
-        if amount_to_run_on is not None:
-            logging.info(f"Avaliable images: {len(self.label_list)}")
-            logging.info(f"Running on {amount_to_run_on} images")
-            self.label_list = self.label_list[:amount_to_run_on]
+        elif munit_output_path:
+            images_names = os.listdir(munit_output_path)
+            self.image_list = [self.img_root / f"{name.split('_')[0]}.jpg" for name in images_names]
+            
+        else:
+            self.image_list = sorted(list(self.img_root.iterdir()))
+
+        logging.info(f"Number of avaliable images: {len(self.label_list)}")
 
         if debug:
             self.label_list = self.label_list[:50]
@@ -101,9 +107,8 @@ class BddDataset(Dataset):
         logging.info('building database...')
         gt_db = []
         height, width = self.shapes
-        for label in tqdm(self.label_list, ascii=True):
-            label_path = str(label)
-            image_path = label_path.replace(str(self.label_root), str(self.img_root)).replace(".json", ".jpg")
+        for image_path in tqdm(self.image_list, ascii=True):
+            label_path = str(image_path).replace(str(self.img_root), str(self.label_root)).replace(".jpg", ".json")
             seg_path = {}
             for i in range(len(self.seg_list)):
                 seg_path[self.seg_list[i]] = label_path.replace(str(self.label_root), str(self.seg_root[i])).replace(".json", ".png")
