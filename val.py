@@ -1,3 +1,4 @@
+from matplotlib import pyplot as plt
 import torch
 import numpy as np
 import argparse
@@ -5,6 +6,9 @@ from tqdm.autonotebook import tqdm
 import os
 import logging
 import cv2
+from pathlib import Path
+import psutil
+from PIL import Image
 
 from utils import smp_metrics
 from utils.utils import ConfusionMatrix, postprocess, scale_coords, process_batch, ap_per_class, fitness, \
@@ -18,8 +22,22 @@ from hybridnets.model import ModelWithLoss
 from utils.constants import *
 
 
+# same one as in config
+normalization_stats = {
+    "mean": [0.485, 0.456, 0.406],
+    "std": [0.229, 0.224, 0.225]
+}
+
+def denormalize(img):
+    img = img.cpu().numpy()
+    img = np.transpose(img, (1, 2, 0))
+    img = img * normalization_stats["std"] + normalization_stats["mean"]
+    img = np.clip(img, 0, 1)
+    img = np.transpose(img, (2, 0, 1))
+    return img
+
 @torch.no_grad()
-def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pred_output_dir, **kwargs):
+def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_dir="val_output/predictions", **kwargs):
     """added tb_writer to write to tensorboard. not in use ATM"""
     model.eval()
 
@@ -31,6 +49,12 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
     best_fitness = kwargs.get('best_fitness', 0)
     best_loss = kwargs.get('best_loss', 0)
     best_epoch = kwargs.get('best_epoch', 0)
+
+    conf_mat_output_dir = Path(pred_output_dir).parent / f'confusion_matrices'
+    precision_recall_output_dir = Path(pred_output_dir).parent / f'precision_recall_curves'
+    os.makedirs(pred_output_dir, exist_ok=True)
+    os.makedirs(conf_mat_output_dir, exist_ok=True)
+    os.makedirs(precision_recall_output_dir, exist_ok=True)
 
     loss_regression_ls = []
     loss_classification_ls = []
@@ -77,59 +101,63 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
         reg_loss = reg_loss.mean()
         seg_loss = seg_loss.mean()
 
-        # prepare vars for visualization
-        i = 0
+        if iter < 10:
+            # prepare vars for visualization
 
-        img = imgs[i].cpu().numpy()
+            img = imgs[0].cpu().numpy()
 
-        step = 0 if step is None else step
+            step = 0 if step is None else step
 
-        labels = annot[i]
-        labels = labels[labels[:, 4] != -1]
+            labels = annot[0]
+            labels = labels[labels[:, 4] != -1]
 
-        out = postprocess(imgs.detach(),
-                            torch.stack([anchors[0]] * imgs.shape[0], 0).detach(), regression.detach(),
-                            classification.detach(),
-                            regressBoxes, clipBoxes,
-                            opt.conf_thres, opt.iou_thres)  # 0.5, 0.3
-        
-        ou = out[i]
-        nl = len(labels)
+            out = postprocess(imgs.detach(),
+                                torch.stack([anchors[0]] * imgs.shape[0], 0).detach(), regression.detach(),
+                                classification.detach(),
+                                regressBoxes, clipBoxes,
+                                opt.conf_thres, opt.iou_thres)  # 0.5, 0.3
+            
+            ou = out[0]
+            nl = len(labels)
 
-        pred = np.column_stack([ou['rois'], ou['scores']])
-        pred = np.column_stack([pred, ou['class_ids']])
-        pred = torch.from_numpy(pred).cuda()
-        # done with visualization vars
+            pred = np.column_stack([ou['rois'], ou['scores']])
+            pred = np.column_stack([pred, ou['class_ids']])
+            pred = torch.from_numpy(pred).cuda()
+            # done with visualization vars
 
-        ### visualize bb
-        # img = cv2.imread('/mnt/raid/home/eyal_michaeli/datasets/bdd/bdd100k/val' + filenames[i],
-        #                         cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION | cv2.IMREAD_UNCHANGED)
-        for label in labels:
-            x1, y1, x2, y2 = [int(x) for x in label[:4]]
-            img = cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 1)
-        for pre in pred:
-            x1, y1, x2, y2 = [int(x) for x in pre[:4]]
-            img = cv2.putText(img, str(pre[4].cpu().numpy()), (x1 - 10, y1 - 10),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-            img = cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
+            ### visualize bb
+            # img = cv2.imread('/mnt/raid/home/eyal_michaeli/datasets/bdd/bdd100k/val' + filenames[i],
+            #                         cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION | cv2.IMREAD_UNCHANGED)
+            for label in labels:
+                x1, y1, x2, y2 = [int(x) for x in label[:4]]
+                img = cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 1)
+            for pre in pred:
+                x1, y1, x2, y2 = [int(x) for x in pre[:4]]
+                img = cv2.putText(img, str(pre[4].cpu().numpy()), (x1 - 10, y1 - 10),
+                                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
+                img = cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
 
-        cv2.imwrite(f"{pred_output_dir}/pred+label-step_{step}-{i}.jpg", img)
-        ### done visualize bb
+            img = denormalize(img)
+            img = np.transpose(img, (1, 2, 0))
+            img = np.clip(img * 255, 0, 255).astype(np.uint8)
+            Image.fromarray(img).save(f"{pred_output_dir}/pred+label-step_{step}-{iter}.jpg")
 
-        # ### Visualization of seg
-        # seg_0 = segmentation[i]
-        # # logging.info('bbb', seg_0.shape)
-        # seg_0 = torch.argmax(seg_0, dim = 0)
-        # # logging.info('before', seg_0.shape)
-        # seg_0 = seg_0.cpu().numpy().transpose(1, 2, 0)
-        # # logging.info(seg_0.shape)
-        # anh = np.zeros((384,640,3)) 
-        # anh[seg_0 == 0] = (255,0,0)
-        # anh[seg_0 == 1] = (0,255,0)
-        # anh[seg_0 == 2] = (0,0,255)
-        # anh = np.uint8(anh)
-        # cv2.imwrite(f"{pred_output_dir}/segmentation-step_{step}-{i}.jpg", anh)    
-        # ### done visulize seg
+            ### done visualize bb
+
+            # ### Visualization of seg
+            # seg_0 = segmentation[i]
+            # # logging.info('bbb', seg_0.shape)
+            # seg_0 = torch.argmax(seg_0, dim = 0)
+            # # logging.info('before', seg_0.shape)
+            # seg_0 = seg_0.cpu().numpy().transpose(1, 2, 0)
+            # # logging.info(seg_0.shape)
+            # anh = np.zeros((384,640,3)) 
+            # anh[seg_0 == 0] = (255,0,0)
+            # anh[seg_0 == 1] = (0,255,0)
+            # anh[seg_0 == 2] = (0,0,255)
+            # anh = np.uint8(anh)
+            # cv2.imwrite(f"{pred_output_dir}/segmentation-step_{step}-{i}.jpg", anh)    
+            # ### done visulize seg
 
         if opt.cal_map:
             out = postprocess(imgs.detach(),
@@ -163,21 +191,6 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
                     pred[:, :4] = scale_coords(imgs[i][1:], pred[:, :4], shapes[i][0], shapes[i][1])
                     labels = scale_coords(imgs[i][1:], labels, shapes[i][0], shapes[i][1])
 
-                    # # visualize bb
-                    # img = cv2.imread('/mnt/raid/home/eyal_michaeli/datasets/bdd/bdd100k/val' + filenames[i],
-                    #                      cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION | cv2.IMREAD_UNCHANGED)
-                    # for label in labels:
-                    #     x1, y1, x2, y2 = [int(x) for x in label[:4]]
-                    #     img = cv2.rectangle(img, (x1, y1), (x2, y2), (255, 0, 0), 1)
-                    # for pre in pred:
-                    #     x1, y1, x2, y2 = [int(x) for x in pre[:4]]
-                    #     img = cv2.putText(img, str(pre[4].cpu().numpy()), (x1 - 10, y1 - 10),
-                    #                           cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1, cv2.LINE_AA)
-                    #     img = cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
-
-                    # cv2.imwrite('pre+label-{}.jpg'.format(filenames[i]), img)
-                    # # done visualize bb
-
                     correct = process_batch(pred, labels, iou_thresholds)
                     if opt.plots:
                         confusion_matrix.process_batch(pred, labels)
@@ -186,21 +199,6 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
                 stats.append((correct.cpu(), pred[:, 4].cpu(), pred[:, 5].cpu(), target_class))
 
                 # logging.info(stats)
-
-                # # Visualization of seg
-                # seg_0 = segmentation[i]
-                # # logging.info('bbb', seg_0.shape)
-                # seg_0 = torch.argmax(seg_0, dim = 0)
-                # # logging.info('before', seg_0.shape)
-                # seg_0 = seg_0.cpu().numpy().transpose(1, 2, 0)
-                # # logging.info(seg_0.shape)
-                # anh = np.zeros((384,640,3))
-                # anh[seg_0 == 0] = (255,0,0)
-                # anh[seg_0 == 1] = (0,255,0)
-                # anh[seg_0 == 2] = (0,0,255)
-                # anh = np.uint8(anh)
-                # cv2.imwrite('segmentation-{}.jpg'.format(filenames[i]),anh)       
-                # # done visulize seg
 
             if seg_mode == MULTICLASS_MODE:
                 segmentation = segmentation.log_softmax(dim=1).exp()
@@ -241,6 +239,12 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
         writer.add_scalars('Classfication_loss', {'val': cls_loss}, step)
         writer.add_scalars('Segmentation_loss', {'val': seg_loss}, step)
 
+        # write memory usage to tensorboard
+        writer.add_scalars('GPU_max_memory', {'train': torch.cuda.max_memory_allocated() / 1024 ** 3}, step)
+        writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step)
+        # same for RAM
+        writer.add_scalars('RAM', {'train': psutil.virtual_memory().percent}, step)
+
     if opt.cal_map:
         for i in range(ncs):
             iou_ls[i] = np.concatenate(iou_ls[i])
@@ -270,12 +274,11 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
         # boxes_per_class = np.bincount(stats[2].astype(np.int64), minlength=1)
 
         ap50 = None
-        save_dir = 'plots'
-        os.makedirs(save_dir, exist_ok=True)
+        precision_recall_output_path = Path(precision_recall_output_dir) / f'precision_recall_curve_step_{step}.png'
 
         # Compute metrics
         if len(stats) and stats[0].any():
-            p, r, f1, ap, ap_class = ap_per_class(*stats, plot=opt.plots, save_dir=save_dir, names=names)
+            p, r, f1, ap, ap_class = ap_per_class(*stats, plot=opt.plots, output_path=precision_recall_output_path, names=names)
             ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
             mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
             nt = np.bincount(stats[3].astype(np.int64), minlength=1)  # number of targets per class
@@ -297,9 +300,10 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
             for i, c in enumerate(ap_class):
                 logging.info(pf % (names[c], seen, nt[c], p[i], r[i], ap50[i], ap[i]))
 
+        conf_matrix_output_path = Path(conf_mat_output_dir) / f'confusion_matrix_step_{step}.png'
         # Plots
         if opt.plots:
-            confusion_matrix.plot(save_dir=save_dir, names=list(names.values()))
+            confusion_matrix.plot(output_path=conf_matrix_output_path, names=list(names.values()))
             confusion_matrix.tp_fp()
 
         results = (mp, mr, map50, map, iou_score, acc_score, loss)
@@ -317,6 +321,14 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
                     'scaler': scaler.state_dict()}
             logging.info("Saving checkpoint with best fitness", fi[0])
             save_checkpoint(ckpt, opt.saved_path, f'hybridnets-d{opt.compound_coef}_{epoch}_{step}_best.pth')
+
+        if is_training:
+            # write memory usage to tensorboard
+            writer.add_scalars('GPU_max_memory', {'train': torch.cuda.max_memory_allocated() / 1024 ** 3}, step+1)
+            writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step+1)
+            # same for RAM
+            writer.add_scalars('RAM', {'train': psutil.virtual_memory().percent}, step+1)
+
     else:
         # if not calculating map, save by best loss
         if is_training and loss + opt.es_min_delta < best_loss:
@@ -335,6 +347,9 @@ def val(model, val_generator, params, opt, seg_mode, is_training, tb_writer, pre
 
 
 if __name__ == "__main__":
+    """
+    CUDA_VISIBLE_DEVICES=0 python val.py --cal_map "True" --conf_thres 0.6 -p bdd10k -c 3 -w logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs/2023_0503_1044_13/checkpoints/hybridnets-d3_6_4375_best.pth
+    """
     ap = argparse.ArgumentParser()
     ap.add_argument('-p', '--project', type=str, default='bdd100k', help='Project file that contains parameters')
     ap.add_argument('-bb', '--backbone', type=str,
@@ -342,7 +357,7 @@ if __name__ == "__main__":
                    'https://github.com/rwightman/pytorch-image-models')
     ap.add_argument('-c', '--compound_coef', type=int, default=3, help='Coefficients of efficientnet backbone')
     ap.add_argument('-w', '--weights', type=str, default='weights/hybridnets.pth', help='/path/to/weights')
-    ap.add_argument('-n', '--num_workers', type=int, default=12, help='Num_workers of dataloader')
+    ap.add_argument('-n', '--num_workers', type=int, default=4, help='Num_workers of dataloader')
     ap.add_argument('--batch_size', type=int, default=12, help='The number of images per batch among all devices')
     ap.add_argument('-v', '--verbose', type=boolean_string, default=True,
                     help='Whether to print results per class when valing')
@@ -376,7 +391,8 @@ if __name__ == "__main__":
                 mean=params.mean, std=params.std
             )
         ]),
-        seg_mode=seg_mode
+        seg_mode=seg_mode,
+        amount_to_run_on=100
     )
 
     val_generator = DataLoaderX(

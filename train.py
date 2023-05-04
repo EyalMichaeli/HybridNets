@@ -10,6 +10,7 @@ from torch import nn
 from torchvision import transforms
 from tqdm.autonotebook import tqdm
 import signal
+import psutil
 
 from val import val
 from backbone import HybridNetsBackbone
@@ -277,6 +278,8 @@ def train(opt):
 
                     writer.add_scalars('GPU_max_memory', {'train': torch.cuda.max_memory_allocated() / 1024 ** 3}, step)
                     writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step)
+                    # same for RAM
+                    writer.add_scalars('RAM', {'train': psutil.virtual_memory().percent}, step)
 
                     scaler.scale(loss).backward()
 
@@ -326,7 +329,7 @@ def train(opt):
             # it will always calculate mAP at the last epoch
             if epoch % opt.val_interval == 0:
                 logging.info('Validating...')
-                best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, tb_writer=writer, pred_output_dir=pred_output_dir,
+                best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, pred_output_dir=pred_output_dir,
                                                           is_training=True, optimizer=optimizer, scaler=scaler, writer=writer, epoch=epoch, step=step, 
                                                           best_fitness=best_fitness, best_loss=best_loss, best_epoch=best_epoch)
     except KeyboardInterrupt:
@@ -412,7 +415,8 @@ if __name__ == '__main__':
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP.txt & 
     
     # no mAP:
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes.txt & 
+    (--conf_thres 0.5 is needed because we calculate mAP on the last epoch)
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=1 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes_ends_with_mAP -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes_ends_with_mAP.txt & 
     
     # with MUNIT output, no mAP:
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --munit_path /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/ --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs.txt & 

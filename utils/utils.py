@@ -333,7 +333,7 @@ def clip_coords(boxes, shape):
         boxes[:, [1, 3]] = boxes[:, [1, 3]].clip(0, shape[0])  # y1, y2
 
 
-def ap_per_class(tp, conf, pred_cls, target_cls, plot=False, save_dir='precision-recall_curve.png', names=[]):
+def ap_per_class(tp, conf, pred_cls, target_cls, plot=False, output_path='precision-recall_curve.png', names=[]):
     """ Compute the average precision, given the recall and precision curves.
     Source: https://github.com/rafaelpadilla/Object-Detection-Metrics.
     # Arguments
@@ -342,7 +342,7 @@ def ap_per_class(tp, conf, pred_cls, target_cls, plot=False, save_dir='precision
         pred_cls:  Predicted object classes (nparray).
         target_cls:  True object classes (nparray).
         plot:  Plot precision-recall curve at mAP@0.5
-        save_dir:  Plot save directory
+        output_path:  Plot save directory
     # Returns
         The average precision as computed in py-faster-rcnn.
     """
@@ -389,7 +389,7 @@ def ap_per_class(tp, conf, pred_cls, target_cls, plot=False, save_dir='precision
     i=r.mean(0).argmax()
 
     if plot:
-        plot_pr_curve(px, py, ap, save_dir, names)
+        plot_pr_curve(px, py, ap, output_path, names)
 
     return p[:, i], r[:, i], f1[:, i], ap, unique_classes.astype('int32')
 
@@ -422,7 +422,7 @@ def compute_ap(recall, precision):
     return ap, mpre, mrec
 
 
-def plot_pr_curve(px, py, ap, save_dir='pr_curve.png', names=()):
+def plot_pr_curve(px, py, ap, output_path='pr_curve.png', names=()):
     # Precision-recall curve
     fig, ax = plt.subplots(1, 1, figsize=(9, 6), tight_layout=True)
     py = np.stack(py, axis=1)
@@ -439,11 +439,11 @@ def plot_pr_curve(px, py, ap, save_dir='pr_curve.png', names=()):
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
-    fig.savefig(Path(save_dir), dpi=250)
+    fig.savefig(Path(output_path), dpi=250)
     plt.close()
 
 
-def plot_mc_curve(px, py, save_dir='mc_curve.png', names=(), xlabel='Confidence', ylabel='Metric'):
+def plot_mc_curve(px, py, output_path='mc_curve.png', names=(), xlabel='Confidence', ylabel='Metric'):
     # Metric-confidence curve
     fig, ax = plt.subplots(1, 1, figsize=(9, 6), tight_layout=True)
 
@@ -460,7 +460,7 @@ def plot_mc_curve(px, py, save_dir='mc_curve.png', names=(), xlabel='Confidence'
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
-    fig.savefig(Path(save_dir), dpi=250)
+    fig.savefig(Path(output_path), dpi=250)
     plt.close()
 
 
@@ -526,7 +526,7 @@ class ConfusionMatrix:
 
         return tp[:-1], fp[:-1], fn[:-1]  # remove background class
 
-    def plot(self, normalize=True, save_dir='', names=()):
+    def plot(self, normalize=True, output_path='', names=()):
         try:
             import seaborn as sn
 
@@ -543,7 +543,7 @@ class ConfusionMatrix:
                            yticklabels=names + ['background FN'] if labels else "auto").set_facecolor((1, 1, 1))
             fig.axes[0].set_xlabel('True')
             fig.axes[0].set_ylabel('Predicted')
-            fig.savefig(Path(save_dir) / 'confusion_matrix.png', dpi=250)
+            fig.savefig(Path(output_path), dpi=250)
             plt.close()
         except Exception as e:
             print(f'WARNING: ConfusionMatrix plot failure: {e}')
