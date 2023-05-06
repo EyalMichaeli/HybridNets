@@ -23,7 +23,7 @@ IMG_ROOT_FOLDER_NAME = "images_a"
 
 class BddDataset(Dataset):
     def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False,
-                 munit_output_path=None, paths_list_file=None, amount_to_run_on=None):
+                 amount_to_run_on=None):
         """
         initial all the characteristic
 
@@ -33,8 +33,6 @@ class BddDataset(Dataset):
         -transform: ToTensor and Normalize
         -seg_mode: segmentation mode
         -debug: whether debug or not
-        -munit_output_path: path to munit output
-        -paths_list_file: path to file containing paths to images
         -amount_to_run_on: number of images to use
         Returns:
         None
@@ -56,17 +54,25 @@ class BddDataset(Dataset):
 
         self.label_root = label_root / indicator
 
-        if paths_list_file:
-            logging.info(f"Using paths list file: {paths_list_file}")
-            with open(paths_list_file, 'r') as f:
-                self.image_list = [line.strip() for line in f.readlines()]
+        if params.dataset['train_csv']:
+            train_csv = params.dataset['train_csv']
+            logging.info(f"Using paths list file: {train_csv}")
 
-        elif munit_output_path:
-            images_names = os.listdir(munit_output_path)
-            self.image_list = [self.img_root / f"{name.split('_')[0]}.jpg" for name in images_names]
-            
+            # Read csv - each row has 4 columns: image_path,gt_path,det_path,seg_path
+            # first row is header
+            with open(train_csv, 'r') as f:
+                lines = f.readlines()[1:]  # Skip the header row
+                self.image_list = [line.split(',')[0] for line in lines]
+                self.label_list = [line.split(',')[1] for line in lines]
+                self.seg_paths_list = [line.split(',')[2] for line in lines]
+                # the last coulmn in the csv is the lane path
+                self.lane_list = [line.split(',')[-1].strip() for line in lines]
+
+                # assert all lengths are equal
+                assert len(self.image_list) == len(self.label_list) == len(self.seg_paths_list) == len(self.lane_list), f"Lengths of lists are not equal - {len(self.image_list)}, {len(self.label_list)}, {len(self.seg_paths_list)}, {len(self.lane_list)}"
+
         else:
-            self.image_list = sorted([str(path) for path in list(self.img_root.iterdir())])
+            raise NotImplementedError("No train_csv provided")
 
         logging.info(f"Number of avaliable images: {len(self.image_list)}")
 
@@ -99,11 +105,6 @@ class BddDataset(Dataset):
         self.mosaic_border = [-1 * self.inputsize[1] // 2, -1 * self.inputsize[0] // 2]
         self.seg_mode = seg_mode
         self.db = self._get_db()
-        self.munit_output_path = munit_output_path
-        if self.munit_output_path:
-            logging.info(f"Using MUNIT output from {self.munit_output_path}")
-        else:
-            logging.info(f"Not using MUNIT output")
 
 
     def _get_db(self):
@@ -113,12 +114,7 @@ class BddDataset(Dataset):
         logging.info('building database...')
         gt_db = []
         height, width = self.shapes
-        for image_path in tqdm(self.image_list, ascii=True):
-            label_path = str(image_path).replace(str(self.img_root), str(self.label_root)).replace(".jpg", ".json")
-            seg_path = {}
-            for i in range(len(self.seg_list)):
-                seg_path[self.seg_list[i]] = label_path.replace(str(self.label_root), str(self.seg_root[i])).replace(".json", ".png")
-                # seg_path[self.seg_list[i]] = cv2.imread(label_path.replace(str(self.label_root), str(self.seg_root[i])).replace(".json", ".png"), 0)
+        for image_path, label_path, seg_path, lane_path in tqdm(zip(self.image_list, self.label_list, self.seg_paths_list, self.lane_list), ascii=True):
             with open(label_path, 'r') as f:
                 label = json.load(f)
             data = label['frames'][0]['objects']
@@ -145,9 +141,10 @@ class BddDataset(Dataset):
                 # 'image': img,
                 'image': image_path,
                 'label': gt,
+                'road': seg_path,
+                'lane': lane_path
             }
-            # Since seg_path is a dynamic dict
-            rec = {**rec, **seg_path}
+
 
             # img = cv2.imread(image_path, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION | cv2.IMREAD_UNCHANGED)
             # # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -190,13 +187,6 @@ class BddDataset(Dataset):
         data = self.db[index]
         det_label = data["label"]
         image_path = str(data["image"])
-
-        if self.munit_output_path:
-            # change the path to same image after MUNIT output
-            image_name = image_path.split('/')[-1]
-            # choose randomly the name suffix for the file name
-            file_name_suffix = random.choice(['_0', '_1', '_2', '_3', '_4', '_source'])
-            image_path = str(Path(self.munit_output_path) / str(image_name.split('.')[0] + file_name_suffix + '.jpg'))
 
         img = cv2.imread(image_path, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

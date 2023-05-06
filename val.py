@@ -28,6 +28,8 @@ normalization_stats = {
     "std": [0.229, 0.224, 0.225]
 }
 
+AMOUNT_TO_RUN_VAL_ON = 3300
+
 def denormalize(img):
     img = np.transpose(img, (1, 2, 0))
     img = img * normalization_stats["std"] + normalization_stats["mean"]
@@ -36,7 +38,7 @@ def denormalize(img):
     return img
 
 @torch.no_grad()
-def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_dir="val_output/predictions", **kwargs):
+def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_dir, **kwargs):
     """added tb_writer to write to tensorboard. not in use ATM"""
     model.eval()
 
@@ -269,7 +271,9 @@ def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_di
         precision_recall_output_path = Path(precision_recall_output_dir) / f'precision_recall_curve_step_{step}.png'
 
         # Compute metrics
+        print(stats)
         if len(stats) and stats[0].any():
+            print("here")
             p, r, f1, ap, ap_class = ap_per_class(*stats, plot=opt.plots, output_path=precision_recall_output_path, names=names)
             ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
             mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
@@ -284,7 +288,9 @@ def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_di
         for i in range(len(params.seg_list)):
             tmp = i+1 if seg_mode != BINARY_MODE else i
             pf += ('%-11.3g' * 3) % (miou_ls[i], iou_ls[tmp], acc_ls[tmp])
+        
         logging.info(pf)
+        
 
         # Print results per class
         if opt.verbose and nc > 1 and len(stats):
@@ -340,7 +346,7 @@ def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_di
 
 if __name__ == "__main__":
     """
-    CUDA_VISIBLE_DEVICES=0 python val.py --cal_map "True" --conf_thres 0.6 -p bdd10k -c 3 -w logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs/2023_0503_1044_13/checkpoints/hybridnets-d3_6_4375_best.pth
+    CUDA_VISIBLE_DEVICES=0 python val.py --cal_map "True" --conf_thres 0.6 -p bdd10k -c 3 -w logs/onlybdd10k_FT_v0_bs_16_duplicated_bus_3/2023_0504_2224_32/checkpoints/hybridnets-d3_35_31068_best.pth --pred_output_dir logs/onlybdd10k_FT_v0_bs_16_duplicated_bus_3/2023_0504_2224_32/step_31k
     """
     ap = argparse.ArgumentParser()
     ap.add_argument('-p', '--project', type=str, default='bdd100k', help='Project file that contains parameters')
@@ -363,6 +369,8 @@ if __name__ == "__main__":
                     help='Confidence threshold in NMS')
     ap.add_argument('--iou_thres', type=float, default=0.6,
                     help='IoU threshold in NMS')
+    # add arg for pred_output_dir
+    ap.add_argument('--pred_output_dir', type=str, default='preds', help='Directory to save predictions')
     args = ap.parse_args()
 
     compound_coef = args.compound_coef
@@ -384,7 +392,7 @@ if __name__ == "__main__":
             )
         ]),
         seg_mode=seg_mode,
-        amount_to_run_on=100
+        amount_to_run_on=10
     )
 
     val_generator = DataLoaderX(
@@ -411,4 +419,5 @@ if __name__ == "__main__":
     if args.num_gpus > 0:
         model.cuda()
 
-    val(model, val_generator, params, args, seg_mode, is_training=False)
+    pred_output_dir = args.pred_output_dir
+    val(model, val_generator, params, args, seg_mode, is_training=False, pred_output_dir=pred_output_dir)

@@ -1,0 +1,97 @@
+2023-05-06 16:55:25,202 INFO Loading train dataset
+2023-05-06 16:55:25,203 INFO Using paths list file: /mnt/raid/home/eyal_michaeli/datasets/bdd/file_paths_csv/base_10k_extra_munit_3_buses.csv
+2023-05-06 16:55:25,257 INFO Number of avaliable images: 13801
+2023-05-06 16:55:25,263 INFO building database...
+2023-05-06 16:55:28,448 INFO database build finish
+2023-05-06 16:55:28,449 INFO Loading validation dataset
+2023-05-06 16:55:28,450 INFO Using paths list file: /mnt/raid/home/eyal_michaeli/datasets/bdd/file_paths_csv/base_10k_extra_munit_3_buses.csv
+2023-05-06 16:55:28,481 INFO Number of avaliable images: 13801
+2023-05-06 16:55:28,482 WARNING Using 330 images
+2023-05-06 16:55:28,482 INFO building database...
+2023-05-06 16:55:28,540 INFO database build finish
+2023-05-06 16:55:31,431 WARNING [Warning] Ignoring Error(s) in loading state_dict for HybridNetsBackbone:
+	size mismatch for classifier.header.pointwise_conv.conv.weight: copying a param with shape torch.Size([9, 160, 1, 1]) from checkpoint, the shape in current model is torch.Size([36, 160, 1, 1]).
+	size mismatch for classifier.header.pointwise_conv.conv.bias: copying a param with shape torch.Size([9]) from checkpoint, the shape in current model is torch.Size([36]).
+2023-05-06 16:55:31,431 INFO [Warning] Don't panic if you see this, this might be because you load a pretrained weights with different number of classes. The rest of the weights should be loaded already.
+2023-05-06 16:55:31,431 INFO [Info] Weights init Successfully
+2023-05-06 16:55:31,512 INFO Epoch 1/50
+2023-05-06 16:55:52,310 INFO Validating...
+2023-05-06 16:56:24,125 INFO Val. Epoch: 1/50. Classification loss: 1136.80310. Regression loss: 2.37424. Segmentation loss: 1.76290. Total loss: 1140.94023
+2023-05-06 16:56:24,380 INFO Epoch 2/50
+2023-05-06 16:56:31,124 INFO Validating...
+2023-05-06 16:56:43,126 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,126 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,126 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,126 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,127 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,127 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,127 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,127 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,128 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,128 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,128 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,128 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,129 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,129 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,129 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,129 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,130 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,130 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,130 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,131 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,131 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,131 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,132 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,132 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,132 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,133 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,133 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,134 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,134 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,137 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,138 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,143 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,144 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,152 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,152 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,155 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,155 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,156 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,161 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,162 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,162 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,162 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,165 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,178 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,179 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,203 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,203 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,225 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:43,249 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:43,415 INFO Continuing training... num_error_signals = 1
+2023-05-06 16:56:44,842 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,842 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,843 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,843 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,843 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,844 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,844 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,844 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,845 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,845 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,845 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,845 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,846 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,848 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,861 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,863 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,873 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,876 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,887 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,888 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,890 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,891 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,904 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,912 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:44,920 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-06 16:56:45,063 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)

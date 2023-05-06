@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import os
+from pathlib import Path
 import traceback
 import logging
 import numpy as np
@@ -26,8 +27,6 @@ from torchinfo import summary
 
 
 AMOUNT_TO_RUN_VAL_ON = 3300
-
-
 
 
 
@@ -68,9 +67,12 @@ def init_logging(logdir):
     Args:
         logdir (str): Log directory name
     """
-    logdir = os.path.join(logdir, get_date_uid())
-    if not os.path.exists(logdir):
-        os.makedirs(logdir, exist_ok=True)
+    # log dir
+    date_uid = get_date_uid()
+    logdir_path = Path(logdir)
+    logdir = str(logdir_path.parent / f"{date_uid}_{logdir_path.name}")
+    os.makedirs(logdir, exist_ok=True)
+    # log file
     log_file = os.path.join(logdir, 'log.log')
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s', level=logging.INFO)
     fh = logging.FileHandler(log_file, mode='w')
@@ -106,8 +108,6 @@ def train(opt):
 
     seg_mode = MULTILABEL_MODE if params.seg_multilabel else MULTICLASS_MODE if len(params.seg_list) > 1 else BINARY_MODE
 
-    train_txt = params.dataset['train_txt']
-
     logging.info("Loading train dataset")
     train_dataset = BddDataset(
         params=params,
@@ -120,9 +120,7 @@ def train(opt):
             )
         ]),
         seg_mode=seg_mode,
-        debug=opt.debug,
-        munit_output_path=opt.munit_path,
-        paths_list_file=train_txt,
+        debug=opt.debug
     )
 
     training_generator = DataLoaderX(
@@ -185,14 +183,14 @@ def train(opt):
             # new_weight = OrderedDict((k[6:], v) for k, v in ckpt['model'].items())
             model.load_state_dict(ckpt.get('model', ckpt), strict=False)
         except RuntimeError as e:
-            logging.info(f'[Warning] Ignoring {e}')
+            logging.warning(f'[Warning] Ignoring {e}')
             logging.info(
-                '[Warning] Don\'t panic if you see this, this might be because you load a pretrained weights with different number of classes. The rest of the weights should be loaded already.')
+                "[Warning] Don't panic if you see this, this might be because you load a pretrained weights with different number of classes. The rest of the weights should be loaded already.")
     else:
         logging.info('[Info] initializing weights...')
         init_weights(model)
 
-    logging.info('[Info] Successfully!!!')
+    logging.info('[Info] Weights init Successfully')
 
     if opt.freeze_backbone:
         model.encoder.requires_grad_(False)
@@ -308,7 +306,7 @@ def train(opt):
 
                     step += 1
 
-                    break # only train one batch for debugging
+                    # break # only train one batch for debugging
                     
                     if step % opt.save_interval == 0 and step > 0:
                         writer.add_scalars('Loss', {'train': loss}, step)
@@ -330,7 +328,7 @@ def train(opt):
             scheduler.step(np.mean(epoch_loss))
 
 
-            opt.cal_map = True if (epoch % opt.calc_mAP_interval == 0 and opt.cal_map) or epoch == opt.num_epochs else False  
+            opt.cal_map = True if (epoch % opt.calc_mAP_interval == 0 and opt.cal_map) or epoch == (opt.num_epochs - 1) else False  
             # if opt.cal_map is False, then it wont calculate mAP. 
             # it will always calculate mAP at the last epoch
             if epoch % opt.val_interval == 0:
@@ -340,6 +338,10 @@ def train(opt):
                                                           best_fitness=best_fitness, best_loss=best_loss, best_epoch=best_epoch)
     except KeyboardInterrupt:
         save_checkpoint(model, opt.saved_path, f'hybridnets-d{opt.compound_coef}_{epoch}_{step}.pth')
+        logging.info('Validating before exsiting training...')
+        best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, pred_output_dir=pred_output_dir,
+                                                    is_training=True, optimizer=optimizer, scaler=scaler, writer=writer, epoch=epoch, step=step, 
+                                                    best_fitness=best_fitness, best_loss=best_loss, best_epoch=best_epoch)
     finally:
         writer.close()
 
@@ -394,8 +396,6 @@ def get_args():
                         help='IoU threshold in NMS')
     parser.add_argument('--amp', type=boolean_string, default=False,
                         help='Automatic Mixed Precision training')
-    # munit output path
-    parser.add_argument('--munit_path', type=str, required=False, default=None)
     parser.add_argument('--calc_mAP_interval', type=int, default=10, help='Number of epoches between calculating mAP')
     # add argument for txt file of file paths
     args = parser.parse_args()
@@ -423,11 +423,11 @@ if __name__ == '__main__':
 
     # no mAP:
     (--conf_thres 0.5 is needed because we calculate mAP on the last epoch)
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=1 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_duplicated_bus_3_train_3_truck_3 -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_duplicated_bus_3_train_3_truck_3.txt & 
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/bdd10k_extra_munit_3_buses -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a bdd10k_extra_munit_3_buses.txt & 
 
     
     # for debugging
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=0 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/debugging -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a debugging.txt & 
+    CUDA_VISIBLE_DEVICES=0 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/debugging/debug -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50
     
     # with MUNIT output, no mAP:
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --munit_path /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/ --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs.txt & 
