@@ -271,9 +271,7 @@ def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_di
         precision_recall_output_path = Path(precision_recall_output_dir) / f'precision_recall_curve_step_{step}.png'
 
         # Compute metrics
-        print(stats)
         if len(stats) and stats[0].any():
-            print("here")
             p, r, f1, ap, ap_class = ap_per_class(*stats, plot=opt.plots, output_path=precision_recall_output_path, names=names)
             ap50, ap = ap[:, 0], ap.mean(1)  # AP@0.5, AP@0.5:0.95
             mp, mr, map50, map = p.mean(), r.mean(), ap50.mean(), ap.mean()
@@ -317,7 +315,7 @@ def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_di
                     'model': model.model.state_dict(),
                     'optimizer': optimizer.state_dict(),
                     'scaler': scaler.state_dict()}
-            logging.info("Saving checkpoint with best fitness", fi[0])
+            logging.info(f"Saving checkpoint with best fitness: {fi[0]}")
             save_checkpoint(ckpt, opt.saved_path, f'hybridnets-d{opt.compound_coef}_{epoch}_{step}_best.pth')
 
         if is_training:
@@ -346,7 +344,9 @@ def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_di
 
 if __name__ == "__main__":
     """
-    CUDA_VISIBLE_DEVICES=0 python val.py --cal_map "True" --conf_thres 0.6 -p bdd10k -c 3 -w logs/onlybdd10k_FT_v0_bs_16_duplicated_bus_3/2023_0504_2224_32/checkpoints/hybridnets-d3_35_31068_best.pth --pred_output_dir logs/onlybdd10k_FT_v0_bs_16_duplicated_bus_3/2023_0504_2224_32/step_31k
+    CUDA_VISIBLE_DEVICES=1 python val.py --cal_map "True" --conf_thres 0.6 -p bdd10k -c 3 \
+        -w logs/2023_0506_2317_04_bdd10k_extra_munit_5/checkpoints/hybridnets-d3_7_30000_best.pth \
+            --pred_output_dir logs/2023_0506_2317_04_bdd10k_extra_munit_5/step_30k
     """
     ap = argparse.ArgumentParser()
     ap.add_argument('-p', '--project', type=str, default='bdd100k', help='Project file that contains parameters')

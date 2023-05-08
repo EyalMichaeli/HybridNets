@@ -423,7 +423,10 @@ if __name__ == '__main__':
 
     # no mAP:
     (--conf_thres 0.5 is needed because we calculate mAP on the last epoch)
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/bdd10k_extra_munit_3_buses -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a bdd10k_extra_munit_3_buses.txt & 
+    # remember to change epochs based on amount of data
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=0 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" \
+        --log_path ./logs/bdd10k_extra_munit_5_stronger_run -p bdd10k -c 3 -b 16  \
+            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 10' 2>&1 | tee -a bdd10k_extra_munit_5_stronger_run.txt & 
 
     
     # for debugging
