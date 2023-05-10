@@ -27,7 +27,7 @@ from collections import OrderedDict
 from torchinfo import summary
 
 
-AMOUNT_TO_RUN_VAL_ON = 3300
+AMOUNT_TO_RUN_VAL_ON = 10000
 
 
 SEED = 42
@@ -104,9 +104,10 @@ def train(opt):
     os.makedirs(opt.saved_path, exist_ok=True)
     os.makedirs(pred_output_dir, exist_ok=True)
 
-    # print pid
+    # print pid, seed
     logging.info(f'PID: {os.getpid()}')
-
+    logging.info(f'Random seed: {SEED}')
+    
     # copy the config file of the project to the log dir
     os.system(f'cp projects/{opt.project}.yml {opt.log_dir_path}')
 
@@ -431,9 +432,10 @@ if __name__ == '__main__':
     # REMEMBER to change epochs based on amount of data
     # num_epochs = 500k / ( 10k * (num_duplicates + 1) )
     # example for MUNIT with 3 outputs: 500k / ( 10k * (3 + 1) ) = 12.5 ~= 13 epochs
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" \
-        --log_path ./logs/bdd10k_repeat_base_with_dataloader_shuffle -p bdd10k -c 3 -b 16  \
-            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a bdd10k_repeat_base_with_dataloader_shuffle.txt & 
+    # example for MUNIT with 5 outputs: 500k / ( 10k * (5 + 1) ) = 8.33 ~= 9 epochs
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=1 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" \
+        --log_path ./logs/bdd10k_repeat_strong_munit_5_outputs_with_dataloader_shuffle_running_val_on_10k -p bdd10k -c 3 -b 16  \
+            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 9' 2>&1 | tee -a bdd10k_repeat_strong_munit_5_outputs_with_dataloader_shuffle_running_val_on_10k.txt & 
 
     
     # for debugging

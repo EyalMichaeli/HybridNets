@@ -33,7 +33,7 @@ seg_list: ['road',
 seg_multilabel: false  # a pixel can belong to multiple labels (i.e. lane line + underlying road)
 
 dataset:
-  train_csv: /mnt/raid/home/eyal_michaeli/datasets/bdd/file_paths_csv/10.0k.csv  # /mnt/raid/home/eyal_michaeli/datasets/bdd/file_paths_csv/10.0k.csv
+  train_csv: /mnt/raid/home/eyal_michaeli/datasets/bdd/file_paths_csv/base_10k_extra_munit_5_all_stronger_munit_run.csv  # /mnt/raid/home/eyal_michaeli/datasets/bdd/file_paths_csv/10.0k.csv
   dataroot: /mnt/raid/home/eyal_michaeli/datasets/bdd/bdd100k/
   labelroot: /mnt/raid/home/eyal_michaeli/datasets/bdd/det_gt_downloaded_from_repo/
   segroot:

@@ -486,3 +486,65 @@
 2023-05-09 23:07:45,570 INFO Step: 28000. Epoch: 45/50. Iteration: 501/625. Cls loss: 206.567. Reg loss: 2.126. Seg loss: 0.197. Total loss: 208.890
 2023-05-09 23:08:38,302 INFO Step: 28100. Epoch: 45/50. Iteration: 601/625. Cls loss: 359.427. Reg loss: 1.645. Seg loss: 0.211. Total loss: 361.283
 2023-05-09 23:08:49,471 INFO Validating...
+2023-05-09 23:10:24,769 INFO Val. Epoch: 45/50. Classification loss: 218.44414. Regression loss: 2.40738. Segmentation loss: 0.22077. Total loss: 221.07230
+2023-05-09 23:10:24,932 INFO Epoch 46/50
+2023-05-09 23:11:09,432 INFO Step: 28200. Epoch: 46/50. Iteration: 76/625. Cls loss: 195.676. Reg loss: 2.365. Seg loss: 0.266. Total loss: 198.306
+2023-05-09 23:12:02,011 INFO Step: 28300. Epoch: 46/50. Iteration: 176/625. Cls loss: 199.952. Reg loss: 2.842. Seg loss: 0.255. Total loss: 203.049
+2023-05-09 23:12:56,070 INFO Step: 28400. Epoch: 46/50. Iteration: 276/625. Cls loss: 182.629. Reg loss: 2.386. Seg loss: 0.193. Total loss: 185.208
+2023-05-09 23:13:48,364 INFO Saved checkpoint to: logs/2023_0509_1237_34_bdd10k_repeat_base_with_dataloader_shuffle/checkpoints/hybridnets-d3_45_28500.pth
+2023-05-09 23:13:48,731 INFO Step: 28500. Epoch: 46/50. Iteration: 376/625. Cls loss: 182.696. Reg loss: 1.771. Seg loss: 0.249. Total loss: 184.717
+2023-05-09 23:14:42,835 INFO Step: 28600. Epoch: 46/50. Iteration: 476/625. Cls loss: 220.814. Reg loss: 2.506. Seg loss: 0.250. Total loss: 223.569
+2023-05-09 23:15:35,560 INFO Step: 28700. Epoch: 46/50. Iteration: 576/625. Cls loss: 168.909. Reg loss: 2.321. Seg loss: 0.251. Total loss: 171.482
+2023-05-09 23:16:01,339 INFO Validating...
+2023-05-09 23:17:35,395 INFO Val. Epoch: 46/50. Classification loss: 206.10321. Regression loss: 2.40649. Segmentation loss: 0.21849. Total loss: 208.72819
+2023-05-09 23:17:35,586 INFO Epoch 47/50
+2023-05-09 23:18:07,403 INFO Step: 28800. Epoch: 47/50. Iteration: 51/625. Cls loss: 233.761. Reg loss: 1.851. Seg loss: 0.284. Total loss: 235.896
+2023-05-09 23:19:00,247 INFO Step: 28900. Epoch: 47/50. Iteration: 151/625. Cls loss: 349.545. Reg loss: 2.241. Seg loss: 0.238. Total loss: 352.025
+2023-05-09 23:19:54,456 INFO Saved checkpoint to: logs/2023_0509_1237_34_bdd10k_repeat_base_with_dataloader_shuffle/checkpoints/hybridnets-d3_46_29000.pth
+2023-05-09 23:19:54,766 INFO Step: 29000. Epoch: 47/50. Iteration: 251/625. Cls loss: 186.305. Reg loss: 2.112. Seg loss: 0.240. Total loss: 188.656
+2023-05-09 23:20:46,949 INFO Step: 29100. Epoch: 47/50. Iteration: 351/625. Cls loss: 155.654. Reg loss: 2.017. Seg loss: 0.199. Total loss: 157.870
+2023-05-09 23:21:41,138 INFO Step: 29200. Epoch: 47/50. Iteration: 451/625. Cls loss: 230.584. Reg loss: 1.966. Seg loss: 0.221. Total loss: 232.771
+2023-05-09 23:22:33,614 INFO Step: 29300. Epoch: 47/50. Iteration: 551/625. Cls loss: 187.162. Reg loss: 1.771. Seg loss: 0.198. Total loss: 189.131
+2023-05-09 23:23:12,096 INFO Validating...
+2023-05-09 23:24:46,342 INFO Val. Epoch: 47/50. Classification loss: 201.96142. Regression loss: 2.40328. Segmentation loss: 0.21447. Total loss: 204.57916
+2023-05-09 23:24:46,511 INFO Epoch 48/50
+2023-05-09 23:25:04,621 INFO Step: 29400. Epoch: 48/50. Iteration: 26/625. Cls loss: 166.636. Reg loss: 2.220. Seg loss: 0.196. Total loss: 169.052
+2023-05-09 23:25:56,754 INFO Saved checkpoint to: logs/2023_0509_1237_34_bdd10k_repeat_base_with_dataloader_shuffle/checkpoints/hybridnets-d3_47_29500.pth
+2023-05-09 23:25:57,075 INFO Step: 29500. Epoch: 48/50. Iteration: 126/625. Cls loss: 189.249. Reg loss: 1.971. Seg loss: 0.203. Total loss: 191.423
+2023-05-09 23:26:51,282 INFO Step: 29600. Epoch: 48/50. Iteration: 226/625. Cls loss: 237.501. Reg loss: 2.344. Seg loss: 0.366. Total loss: 240.211
+2023-05-09 23:27:44,179 INFO Step: 29700. Epoch: 48/50. Iteration: 326/625. Cls loss: 109.148. Reg loss: 3.055. Seg loss: 0.253. Total loss: 112.457
+2023-05-09 23:28:37,942 INFO Step: 29800. Epoch: 48/50. Iteration: 426/625. Cls loss: 181.910. Reg loss: 2.418. Seg loss: 0.186. Total loss: 184.514
+2023-05-09 23:29:30,630 INFO Step: 29900. Epoch: 48/50. Iteration: 526/625. Cls loss: 194.987. Reg loss: 2.807. Seg loss: 0.201. Total loss: 197.995
+2023-05-09 23:30:22,979 INFO Saved checkpoint to: logs/2023_0509_1237_34_bdd10k_repeat_base_with_dataloader_shuffle/checkpoints/hybridnets-d3_47_30000.pth
+2023-05-09 23:30:22,980 INFO Validating...
+2023-05-09 23:31:57,037 INFO Val. Epoch: 48/50. Classification loss: 191.74556. Regression loss: 2.39534. Segmentation loss: 0.21102. Total loss: 194.35191
+2023-05-09 23:31:57,321 INFO Epoch 49/50
+2023-05-09 23:32:02,720 INFO Step: 30000. Epoch: 49/50. Iteration: 1/625. Cls loss: 167.452. Reg loss: 2.703. Seg loss: 0.259. Total loss: 170.414
+2023-05-09 23:32:54,917 INFO Step: 30100. Epoch: 49/50. Iteration: 101/625. Cls loss: 239.068. Reg loss: 1.820. Seg loss: 0.200. Total loss: 241.087
+2023-05-09 23:33:49,326 INFO Step: 30200. Epoch: 49/50. Iteration: 201/625. Cls loss: 336.340. Reg loss: 1.783. Seg loss: 0.269. Total loss: 338.391
+2023-05-09 23:34:41,894 INFO Step: 30300. Epoch: 49/50. Iteration: 301/625. Cls loss: 138.294. Reg loss: 2.703. Seg loss: 0.167. Total loss: 141.164
+2023-05-09 23:35:36,051 INFO Step: 30400. Epoch: 49/50. Iteration: 401/625. Cls loss: 206.470. Reg loss: 2.398. Seg loss: 0.209. Total loss: 209.077
+2023-05-09 23:36:28,469 INFO Saved checkpoint to: logs/2023_0509_1237_34_bdd10k_repeat_base_with_dataloader_shuffle/checkpoints/hybridnets-d3_48_30500.pth
+2023-05-09 23:36:28,779 INFO Step: 30500. Epoch: 49/50. Iteration: 501/625. Cls loss: 270.528. Reg loss: 2.085. Seg loss: 0.205. Total loss: 272.819
+2023-05-09 23:37:23,022 INFO Step: 30600. Epoch: 49/50. Iteration: 601/625. Cls loss: 177.423. Reg loss: 2.657. Seg loss: 0.202. Total loss: 180.282
+2023-05-09 23:37:33,554 INFO Validating...
+2023-05-09 23:39:07,887 INFO Val. Epoch: 49/50. Classification loss: 186.64944. Regression loss: 2.39890. Segmentation loss: 0.20786. Total loss: 189.25620
+2023-05-09 23:39:08,081 INFO Epoch 50/50
+2023-05-09 23:39:52,389 INFO Step: 30700. Epoch: 50/50. Iteration: 76/625. Cls loss: 173.529. Reg loss: 2.137. Seg loss: 0.194. Total loss: 175.859
+2023-05-09 23:40:44,560 INFO Step: 30800. Epoch: 50/50. Iteration: 176/625. Cls loss: 403.730. Reg loss: 1.670. Seg loss: 0.415. Total loss: 405.815
+2023-05-09 23:41:39,021 INFO Step: 30900. Epoch: 50/50. Iteration: 276/625. Cls loss: 159.705. Reg loss: 2.003. Seg loss: 0.180. Total loss: 161.888
+2023-05-09 23:42:31,439 INFO Saved checkpoint to: logs/2023_0509_1237_34_bdd10k_repeat_base_with_dataloader_shuffle/checkpoints/hybridnets-d3_49_31000.pth
+2023-05-09 23:42:31,745 INFO Step: 31000. Epoch: 50/50. Iteration: 376/625. Cls loss: 172.631. Reg loss: 2.354. Seg loss: 0.258. Total loss: 175.243
+2023-05-09 23:43:26,168 INFO Step: 31100. Epoch: 50/50. Iteration: 476/625. Cls loss: 175.448. Reg loss: 2.354. Seg loss: 0.226. Total loss: 178.028
+2023-05-09 23:44:18,857 INFO Step: 31200. Epoch: 50/50. Iteration: 576/625. Cls loss: 172.356. Reg loss: 1.811. Seg loss: 0.208. Total loss: 174.375
+2023-05-09 23:44:44,716 INFO Validating...
+2023-05-09 23:44:44,721 INFO Calculating mAP... will take one hour or more...
+2023-05-09 23:46:20,970 INFO Val. Epoch: 50/50. Classification loss: 177.28716. Regression loss: 2.39321. Segmentation loss: 0.20502. Total loss: 179.88539
+2023-05-09 23:46:22,702 INFO                                                                                                        road                             lane                             
+2023-05-09 23:46:22,703 INFO Class          Images     Labels     P          R          mAP@.5     mAP@.5:.95 mIoU       mAcc       mIoU       IoU        Acc        mIoU       IoU        Acc        
+2023-05-09 23:46:22,703 INFO all            3300       35938      0.0288     0.122      0.0167     0.00895    0.757      0.906      0.897      0.824      0.955      0.723      0.475      0.813      
+2023-05-09 23:46:22,703 INFO car            3300       33973      0.114      0.138      0.066      0.0355     
+2023-05-09 23:46:22,703 INFO bus            3300       521        2.61e-05   0.0441     1.38e-05   5.71e-06   
+2023-05-09 23:46:22,703 INFO truck          3300       1440       0.000914   0.306      0.00066    0.00028    
+2023-05-09 23:46:22,703 INFO train          3300       4          0          0          0          0          
+2023-05-09 23:46:23,300 INFO Saving checkpoint with best fitness: 0.009719343770780355
