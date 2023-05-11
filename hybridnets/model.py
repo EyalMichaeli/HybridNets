@@ -3,6 +3,7 @@ import torch
 from torchvision.ops.boxes import nms as nms_torch
 import torch.nn.functional as F
 import math
+import logging
 from functools import partial
 from hybridnets.loss import FocalLoss, FocalLossSeg, TverskyLoss
 
@@ -521,6 +522,7 @@ class BiFPNDecoder(nn.Module):
 class Classifier(nn.Module):
     def __init__(self, in_channels, num_anchors, num_classes, num_layers, pyramid_levels=5, onnx_export=False):
         super(Classifier, self).__init__()
+        logging.info(f"Initializing Classifier with num_classes: {num_classes}")
         self.num_anchors = num_anchors
         self.num_classes = num_classes
         self.num_layers = num_layers

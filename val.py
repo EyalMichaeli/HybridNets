@@ -9,7 +9,7 @@ import cv2
 from pathlib import Path
 import psutil
 from PIL import Image
-
+from torch.utils.tensorboard import SummaryWriter
 from utils import smp_metrics
 from utils.utils import ConfusionMatrix, postprocess, scale_coords, process_batch, ap_per_class, fitness, \
     save_checkpoint, DataLoaderX, BBoxTransform, ClipBoxes, boolean_string, Params
@@ -44,7 +44,7 @@ def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_di
 
     optimizer = kwargs.get('optimizer', None)
     scaler = kwargs.get('scaler', None)
-    writer = kwargs.get('writer', None)
+    writer: SummaryWriter = kwargs.get('writer', None)
     epoch = kwargs.get('epoch', 0)
     step = kwargs.get('step', 0)
     best_fitness = kwargs.get('best_fitness', 0)

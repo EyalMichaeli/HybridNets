@@ -30,7 +30,7 @@ from torchinfo import summary
 AMOUNT_TO_RUN_VAL_ON = 10000
 
 
-SEED = 42
+SEED = 2
 np.random.seed(SEED)
 random.seed(SEED)
 torch.cuda.manual_seed(SEED)
@@ -234,7 +234,8 @@ def train(opt):
         # scaler.load_state_dict(ckpt['scaler'])
         # optimizer.load_state_dict(ckpt['optimizer'])
 
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3, verbose=True)
+    # scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3, verbose=True)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=9000, gamma=0.9)
 
     epoch = 0
     best_loss = 1e5
@@ -306,10 +307,13 @@ def train(opt):
                             'Step: {}. Epoch: {}/{}. Iteration: {}/{}. Cls loss: {:.3f}. Reg loss: {:.3f}. Seg loss: {:.3f}. Total loss: {:.3f}'.format(
                                 step, epoch+1, opt.num_epochs, iter + 1, num_iter_per_epoch, cls_loss.float().item(),
                                 reg_loss.item(), seg_loss.item(), loss.item()))
-                        # writer.add_scalars('GPU_max_memory', {'train': torch.cuda.max_memory_allocated() / 1024 ** 3}, step)
-                        # writer.add_scalars('GPU_memory', {'train': torch.cuda.memory_allocated() / 1024 ** 3}, step)
 
                     step += 1
+                    last_lr = optimizer.param_groups[0]['lr']
+                    scheduler.step()
+                    # print LR if it changes due to scheduler
+                    if last_lr != optimizer.param_groups[0]['lr']:
+                        logging.info(f'LR updated: {optimizer.param_groups[0]["lr"]}')
 
                     # break # only train one batch for debugging
                     
@@ -330,7 +334,7 @@ def train(opt):
                     logging.error(e)
                     continue
 
-            scheduler.step(np.mean(epoch_loss))
+            # used to be here: scheduler.step(np.mean(epoch_loss))
 
 
             opt.cal_map = True if (epoch % opt.calc_mAP_interval == 0 and opt.cal_map) or epoch == (opt.num_epochs - 1) else False  
@@ -440,7 +444,7 @@ if __name__ == '__main__':
             -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6' > bdd_10k_w_extra_ip2p_3k_val_on_10k.txt & 
 
     # repeat base
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --num_epochs #50 --cal_map "False" --conf_thres 0.5 --amp "True" \
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --num_epochs 50 --cal_map "False" --conf_thres 0.5 --amp "True" \
         --log_path ./logs/bdd10k_repeat_base_with_dataloader_shuffle_running_val_on_10k -p bdd10k -c 3 -b 16  \
             -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 ' > bdd10k_repeat_base_with_dataloader_shuffle_running_val_on_10k.txt & 
 
@@ -457,7 +461,7 @@ if __name__ == '__main__':
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --conf_thres 0.5 --munit_path /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/ --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs.txt & 
     
     # tensorboard:
-    tensorboard --logdir=logs --port=6009
+    tensorboard --logdir=logs --port=6007
 
     """
     opt = get_args()

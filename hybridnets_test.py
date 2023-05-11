@@ -16,6 +16,12 @@ from collections import OrderedDict
 from torch.nn import functional as F
 
 
+"""
+python hybridnets_test.py -p bdd10k -c 3  \
+    -w logs/2023_0510_1819_02_bdd10k_repeat_base_with_dataloader_shuffle_running_val_on_10k/checkpoints/hybridnets-d3_0_500.pth \
+        --source demo/image --output demo_result 
+"""
+
 parser = argparse.ArgumentParser('HybridNets: End-to-End Perception Network - DatVu')
 parser.add_argument('-p', '--project', type=str, default='bdd100k', help='Project file that contains parameters')
 parser.add_argument('-bb', '--backbone', type=str, help='Use timm to create another backbone replacing efficientnet. '
@@ -24,7 +30,7 @@ parser.add_argument('-c', '--compound_coef', type=int, default=3, help='Coeffici
 parser.add_argument('--source', type=str, default='demo/image', help='The demo image folder')
 parser.add_argument('--output', type=str, default='demo_result', help='Output folder')
 parser.add_argument('-w', '--load_weights', type=str, default='weights/hybridnets.pth')
-parser.add_argument('--conf_thresh', type=restricted_float, default='0.25')
+parser.add_argument('--conf_thresh', type=restricted_float, default='0.4')
 parser.add_argument('--iou_thresh', type=restricted_float, default='0.3')
 parser.add_argument('--imshow', type=boolean_string, default=False, help="Show result onscreen (unusable on colab, jupyter...)")
 parser.add_argument('--imwrite', type=boolean_string, default=True, help="Write result to output folder")
@@ -111,6 +117,11 @@ else:
 x = x.to(torch.float16 if use_cuda and use_float16 else torch.float32)
 # print(x.shape)
 weight = torch.load(weight, map_location='cuda' if use_cuda else 'cpu')
+
+# if it's a new model, the weights will be in the key 'model'
+if 'model' in weight:
+    weight = weight['model']
+
 #new_weight = OrderedDict((k[6:], v) for k, v in weight['model'].items())
 weight_last_layer_seg = weight['segmentation_head.0.weight']
 if weight_last_layer_seg.size(0) == 1:

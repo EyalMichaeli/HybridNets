@@ -1,0 +1,71 @@
+2023-05-11 21:16:33,588 INFO PID: 3436913
+2023-05-11 21:16:33,588 INFO Random seed: 2
+2023-05-11 21:16:33,592 INFO Loading train dataset
+2023-05-11 21:16:33,592 INFO Using paths list file: /mnt/raid/home/eyal_michaeli/datasets/bdd/file_paths_csv/base_10k_extra_3k_ip2p_constant_instructions.csv
+2023-05-11 21:16:33,621 INFO Number of avaliable images: 13264
+2023-05-11 21:16:33,621 WARNING Using 100 images
+2023-05-11 21:16:33,621 INFO building database...
+2023-05-11 21:16:33,638 INFO database build finish
+2023-05-11 21:16:33,639 INFO Loading validation dataset
+2023-05-11 21:16:33,639 INFO Using paths list file: /mnt/raid/home/eyal_michaeli/datasets/bdd/file_paths_csv/base_10k_extra_3k_ip2p_constant_instructions.csv
+2023-05-11 21:16:33,663 INFO Number of avaliable images: 13264
+2023-05-11 21:16:33,663 WARNING Using 10000 images
+2023-05-11 21:16:33,664 INFO building database...
+2023-05-11 21:16:35,154 INFO database build finish
+2023-05-11 21:16:35,195 INFO Initializing Classifier with num_classes: 4
+2023-05-11 21:16:37,688 WARNING [Warning] Ignoring Error(s) in loading state_dict for HybridNetsBackbone:
+	size mismatch for classifier.header.pointwise_conv.conv.weight: copying a param with shape torch.Size([9, 160, 1, 1]) from checkpoint, the shape in current model is torch.Size([36, 160, 1, 1]).
+	size mismatch for classifier.header.pointwise_conv.conv.bias: copying a param with shape torch.Size([9]) from checkpoint, the shape in current model is torch.Size([36]).
+2023-05-11 21:16:37,688 INFO [Warning] Don't panic if you see this, this might be because you load a pretrained weights with different number of classes. The rest of the weights should be loaded already.
+2023-05-11 21:16:37,688 INFO [Info] Weights init Successfully
+2023-05-11 21:16:37,741 INFO Epoch 1/50
+2023-05-11 21:17:01,482 INFO Epoch 2/50
+2023-05-11 21:17:07,562 INFO Epoch 3/50
+2023-05-11 21:17:13,564 INFO Epoch 4/50
+2023-05-11 21:17:19,551 INFO Epoch 5/50
+2023-05-11 21:17:25,549 INFO Epoch 6/50
+2023-05-11 21:17:31,574 INFO Epoch 7/50
+2023-05-11 21:17:37,340 INFO Epoch 8/50
+2023-05-11 21:17:42,974 INFO Epoch 9/50
+2023-05-11 21:17:48,943 INFO Epoch 10/50
+2023-05-11 21:17:54,803 INFO Epoch 11/50
+2023-05-11 21:18:00,821 INFO Epoch 12/50
+2023-05-11 21:18:06,876 INFO Epoch 13/50
+2023-05-11 21:18:12,780 INFO Epoch 14/50
+2023-05-11 21:18:18,840 INFO Epoch 15/50
+2023-05-11 21:18:23,687 INFO Step: 100. Epoch: 15/50. Iteration: 3/7. Cls loss: 906.089. Reg loss: 2.799. Seg loss: 2.125. Total loss: 911.013
+2023-05-11 21:18:24,830 INFO Epoch 16/50
+2023-05-11 21:18:30,803 INFO Epoch 17/50
+2023-05-11 21:18:36,524 INFO Epoch 18/50
+2023-05-11 21:18:42,465 INFO Epoch 19/50
+2023-05-11 21:18:48,397 INFO Epoch 20/50
+2023-05-11 21:18:54,482 INFO Epoch 21/50
+2023-05-11 21:19:00,376 INFO Epoch 22/50
+2023-05-11 21:19:04,563 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:04,563 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:04,563 INFO Continuing training... num_error_signals = 1
+2023-05-11 21:19:04,564 INFO Continuing training... num_error_signals = 1
+2023-05-11 21:19:04,564 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:04,564 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:04,565 INFO Continuing training... num_error_signals = 1
+2023-05-11 21:19:04,565 INFO Continuing training... num_error_signals = 1
+2023-05-11 21:19:04,565 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:04,565 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:04,566 INFO Continuing training... num_error_signals = 1
+2023-05-11 21:19:04,566 INFO Continuing training... num_error_signals = 1
+2023-05-11 21:19:04,566 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:04,566 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:04,566 INFO Continuing training... num_error_signals = 1
+2023-05-11 21:19:04,566 INFO Continuing training... num_error_signals = 1
+2023-05-11 21:19:04,594 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:04,830 INFO Continuing training... num_error_signals = 1
+2023-05-11 21:19:06,656 INFO Epoch 23/50
+2023-05-11 21:19:08,728 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:08,728 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:08,728 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:08,736 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:08,747 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:08,760 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:08,764 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:08,792 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
+2023-05-11 21:19:08,830 ERROR Received signal: SIGINT (<module 'signal' from '/mnt/raid/home/eyal_michaeli/anaconda3/envs/HybridNets/lib/python3.8/signal.py'>)
