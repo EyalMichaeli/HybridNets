@@ -107,7 +107,7 @@ def train(opt):
     # print pid, seed
     logging.info(f'PID: {os.getpid()}')
     logging.info(f'Random seed: {SEED}')
-    
+
     # copy the config file of the project to the log dir
     os.system(f'cp projects/{opt.project}.yml {opt.log_dir_path}')
 
@@ -336,7 +336,7 @@ def train(opt):
             opt.cal_map = True if (epoch % opt.calc_mAP_interval == 0 and opt.cal_map) or epoch == (opt.num_epochs - 1) else False  
             # if opt.cal_map is False, then it wont calculate mAP. 
             # it will always calculate mAP at the last epoch
-            if epoch % opt.val_interval == 0:
+            if step % opt.val_interval == 0:
                 logging.info('Validating...')
                 best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, pred_output_dir=pred_output_dir,
                                                           is_training=True, optimizer=optimizer, scaler=scaler, writer=writer, epoch=epoch, step=step, 
@@ -370,7 +370,7 @@ def get_args():
                                                                    'suggest using \'adamw\' until the'
                                                                    ' very final stage then switch to \'sgd\'')
     parser.add_argument('--num_epochs', type=int, default=500)
-    parser.add_argument('--val_interval', type=int, default=1, help='Number of epoches between valing phases')
+    parser.add_argument('--val_interval', type=int, default=1000, help='Number of STEPS (used to be epoches) between valing phases')
     parser.add_argument('--save_interval', type=int, default=500, help='Number of steps between saving')
     parser.add_argument('--es_min_delta', type=float, default=0.0,
                         help='Early stopping\'s parameter: minimum change loss to qualify as an improvement')
@@ -426,6 +426,8 @@ if __name__ == '__main__':
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP.txt & 
     
 
+    
+
     # no mAP:
     (--conf_thres 0.5 is needed because we calculate mAP on the last epoch)
 
@@ -433,10 +435,17 @@ if __name__ == '__main__':
     # num_epochs = 500k / ( 10k * (num_duplicates + 1) )
     # example for MUNIT with 3 outputs: 500k / ( 10k * (3 + 1) ) = 12.5 ~= 13 epochs
     # example for MUNIT with 5 outputs: 500k / ( 10k * (5 + 1) ) = 8.33 ~= 9 epochs
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=1 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" \
-        --log_path ./logs/bdd10k_repeat_strong_munit_5_outputs_with_dataloader_shuffle_running_val_on_10k -p bdd10k -c 3 -b 16  \
-            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 9' 2>&1 | tee -a bdd10k_repeat_strong_munit_5_outputs_with_dataloader_shuffle_running_val_on_10k.txt & 
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py  --num_epochs #40 --cal_map "False" --conf_thres 0.5 --amp "True" \
+        --log_path ./logs/bdd_10k_w_extra_ip2p_3k_val_on_10k -p bdd10k -c 3 -b 16  \
+            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6' > bdd_10k_w_extra_ip2p_3k_val_on_10k.txt & 
 
+    # repeat base
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --num_epochs #50 --cal_map "False" --conf_thres 0.5 --amp "True" \
+        --log_path ./logs/bdd10k_repeat_base_with_dataloader_shuffle_running_val_on_10k -p bdd10k -c 3 -b 16  \
+            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 ' > bdd10k_repeat_base_with_dataloader_shuffle_running_val_on_10k.txt & 
+
+
+            
     
     # for debugging
     CUDA_VISIBLE_DEVICES=0 python train.py --cal_map "False" --conf_thres 0.5 --amp "True" --log_path ./logs/debugging/debug -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50
@@ -448,7 +457,7 @@ if __name__ == '__main__':
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --conf_thres 0.5 --munit_path /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k/ --cal_map "False" --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_with_MUNIT_5_outputs.txt & 
     
     # tensorboard:
-    tensorboard --logdir=logs --port=6008
+    tensorboard --logdir=logs --port=6009
 
     """
     opt = get_args()
