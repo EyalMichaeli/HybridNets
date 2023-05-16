@@ -30,7 +30,7 @@ from torchinfo import summary
 AMOUNT_TO_RUN_VAL_ON = 10000
 
 
-SEED = 2
+SEED = 3
 np.random.seed(SEED)
 random.seed(SEED)
 torch.cuda.manual_seed(SEED)
@@ -50,8 +50,8 @@ def signal_handler(sig, frame):
         exit(1)
     logging.info(f"Continuing training... num_error_signals = {num_error_signals}")
 
-# Register the signal handler for keyboard interruption (Ctrl+C)
-signal.signal(signal.SIGINT, signal_handler)
+# # Register the signal handler for keyboard interruption (Ctrl+C)
+# signal.signal(signal.SIGINT, signal_handler)
 
 # Register the signal handler for program termination signals
 signal.signal(signal.SIGTERM, signal_handler)
@@ -125,7 +125,9 @@ def train(opt):
             )
         ]),
         seg_mode=seg_mode,
-        debug=opt.debug
+        debug=opt.debug,
+        augmented_dataset_path=opt.augmented_dataset_path,
+        augmented_dataset_sample_rate=opt.augmented_dataset_sample_ratio
     )
 
     training_generator = DataLoaderX(
@@ -228,6 +230,9 @@ def train(opt):
         optimizer = torch.optim.AdamW(model.parameters(), opt.lr)
     else:
         optimizer = torch.optim.SGD(model.parameters(), opt.lr, momentum=0.9, nesterov=True)
+
+    writer.add_scalar('learning_rate', opt.lr, 0)
+
     # logging.info(ckpt)
     scaler = torch.cuda.amp.GradScaler(enabled=opt.amp)
     # if opt.load_weights is not None and ckpt.get('optimizer', None):
@@ -311,9 +316,11 @@ def train(opt):
                     step += 1
                     last_lr = optimizer.param_groups[0]['lr']
                     scheduler.step()
+                    current_lr = optimizer.param_groups[0]['lr']
                     # print LR if it changes due to scheduler
-                    if last_lr != optimizer.param_groups[0]['lr']:
-                        logging.info(f'LR updated: {optimizer.param_groups[0]["lr"]}')
+                    if last_lr != current_lr:
+                        logging.info(f'LR updated: {last_lr} --> {current_lr}')
+                        writer.add_scalar('learning_rate', last_lr, step)
 
                     # break # only train one batch for debugging
                     
@@ -323,12 +330,19 @@ def train(opt):
                         writer.add_scalars('Classfication_loss', {'train': cls_loss}, step)
                         writer.add_scalars('Segmentation_loss', {'train': seg_loss}, step)
                         
-                        # log learning_rate
-                        current_lr = optimizer.param_groups[0]['lr']
-                        writer.add_scalar('learning_rate', current_lr, step)
                         save_checkpoint(model, opt.saved_path, f'hybridnets-d{opt.compound_coef}_{epoch}_{step}.pth')
                         logging.info('Saved checkpoint to: ' + f'{opt.saved_path}/hybridnets-d{opt.compound_coef}_{epoch}_{step}.pth')
 
+
+                    opt.cal_map = True if (step % opt.calc_mAP_interval == 0 and opt.cal_map) else False  
+                    # if opt.cal_map is False, then it wont calculate mAP. 
+                    # it will always calculate mAP at the last epoch
+                    if step % opt.val_interval == 0:
+                        logging.info('Validating...')
+                        best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, pred_output_dir=pred_output_dir,
+                                                                is_training=True, optimizer=optimizer, scaler=scaler, writer=writer, epoch=epoch, step=step, 
+                                                                best_fitness=best_fitness, best_loss=best_loss, best_epoch=best_epoch)
+                        
                 except Exception as e:
                     logging.error('[Error]', traceback.format_exc())
                     logging.error(e)
@@ -336,16 +350,17 @@ def train(opt):
 
             # used to be here: scheduler.step(np.mean(epoch_loss))
 
-
-            opt.cal_map = True if (epoch % opt.calc_mAP_interval == 0 and opt.cal_map) or epoch == (opt.num_epochs - 1) else False  
-            # if opt.cal_map is False, then it wont calculate mAP. 
-            # it will always calculate mAP at the last epoch
-            if step % opt.val_interval == 0:
-                logging.info('Validating...')
+            if epoch == (opt.num_epochs - 1):
+                opt.cal_map = True
+                logging.info('Final validating...')
                 best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, pred_output_dir=pred_output_dir,
-                                                          is_training=True, optimizer=optimizer, scaler=scaler, writer=writer, epoch=epoch, step=step, 
-                                                          best_fitness=best_fitness, best_loss=best_loss, best_epoch=best_epoch)
-    except KeyboardInterrupt:
+                                                            is_training=True, optimizer=optimizer, scaler=scaler, writer=writer, epoch=epoch, step=step, 
+                                                            best_fitness=best_fitness, best_loss=best_loss, best_epoch=best_epoch)
+
+
+    except Exception as e:
+        opt.cal_map = True
+        logging.error('[Error]', traceback.format_exc())
         save_checkpoint(model, opt.saved_path, f'hybridnets-d{opt.compound_coef}_{epoch}_{step}.pth')
         logging.info('Validating before exsiting training...')
         best_fitness, best_loss, best_epoch = val(model, val_generator, params, opt, seg_mode, pred_output_dir=pred_output_dir,
@@ -374,7 +389,7 @@ def get_args():
                                                                    'suggest using \'adamw\' until the'
                                                                    ' very final stage then switch to \'sgd\'')
     parser.add_argument('--num_epochs', type=int, default=500)
-    parser.add_argument('--val_interval', type=int, default=1000, help='Number of STEPS (used to be epoches) between valing phases')
+    parser.add_argument('--val_interval', type=int, default=2000, help='Number of STEPS (used to be epoches) between valing phases')
     parser.add_argument('--save_interval', type=int, default=500, help='Number of steps between saving')
     parser.add_argument('--es_min_delta', type=float, default=0.0,
                         help='Early stopping\'s parameter: minimum change loss to qualify as an improvement')
@@ -405,8 +420,10 @@ def get_args():
                         help='IoU threshold in NMS')
     parser.add_argument('--amp', type=boolean_string, default=False,
                         help='Automatic Mixed Precision training')
-    parser.add_argument('--calc_mAP_interval', type=int, default=10, help='Number of epoches between calculating mAP')
-    # add argument for txt file of file paths
+    parser.add_argument('--calc_mAP_interval', type=int, default=50000, help='Number of STEPS (used to be epochs) between calculating mAP')
+    # augmented_dataset_path
+    parser.add_argument('--augmented_dataset_path', type=str, default=None, help='Path to augmented dataset')
+    parser.add_argument('--augmented_dataset_sample_ratio', type=float, default=0.2, help='Ratio of augmented dataset to be used')
     args = parser.parse_args()
     return args
 
@@ -430,8 +447,8 @@ if __name__ == '__main__':
     nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --conf_thres 0.5 --amp "True" --log_path ./logs/onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP -p bdd10k -c 3 -b 16  -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 --num_epochs 50' 2>&1 | tee -a onlybdd10k_FT_v0_bs_16_repeat_more_classes_with_mAP.txt & 
     
 
-    
 
+    
     # no mAP:
     (--conf_thres 0.5 is needed because we calculate mAP on the last epoch)
 
@@ -439,14 +456,25 @@ if __name__ == '__main__':
     # num_epochs = 500k / ( 10k * (num_duplicates + 1) )
     # example for MUNIT with 3 outputs: 500k / ( 10k * (3 + 1) ) = 12.5 ~= 13 epochs
     # example for MUNIT with 5 outputs: 500k / ( 10k * (5 + 1) ) = 8.33 ~= 9 epochs
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py  --num_epochs #40 --cal_map "False" --conf_thres 0.5 --amp "True" \
-        --log_path ./logs/bdd_10k_w_extra_ip2p_3k_val_on_10k -p bdd10k -c 3 -b 16  \
-            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6' > bdd_10k_w_extra_ip2p_3k_val_on_10k.txt & 
 
     # repeat base
-    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py --num_epochs 50 --cal_map "False" --conf_thres 0.5 --amp "True" \
-        --log_path ./logs/bdd10k_repeat_base_with_dataloader_shuffle_running_val_on_10k -p bdd10k -c 3 -b 16  \
-            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 ' > bdd10k_repeat_base_with_dataloader_shuffle_running_val_on_10k.txt & 
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=1 python train.py --num_epochs 100 --cal_map "False" --conf_thres 0.5 --amp "True" \
+        --log_path ./logs/bdd10k_repeat_base_100_epochs -p bdd10k -c 3 -b 16  \
+            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6 ' > bdd10k_repeat_base_100_epochs.txt & 
+
+    # repeat MUNIT
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=2 python train.py  --num_epochs 50 --cal_map "False" --conf_thres 0.5 --amp "True" \
+        --augmented_dataset_path /mnt/raid/home/eyal_michaeli/git/imaginaire/logs/2023_0421_1405_28_ampO1_lower_LR/inference_cp_400k_style_std_1.5_on_new_10k_matching_csv \
+        --augmented_dataset_sample_ratio 0.5 \
+        --log_path ./logs/bdd10k_repeat_gentle_munit_5_w_0.5 -p bdd10k -c 3 -b 16  \
+            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6' > bdd10k_repeat_gentle_munit_5_w_0.5.txt & 
+
+    # repeat ip2p
+    nohup sh -c 'CUDA_VISIBLE_DEVICES=3 python train.py  --num_epochs 50 --cal_map "False" --conf_thres 0.5 --amp "True" \
+        --augmented_dataset_path /mnt/raid/home/eyal_michaeli/git/instruct-pix2pix/datasets/bdd_ip2p_2k_constant_instructions/images \
+        --augmented_dataset_sample_ratio 0.2 \
+        --log_path ./logs/bdd_10k_w_extra_ip2p_2_outputs_w_0.2 -p bdd10k -c 3 -b 16  \
+            -w weights/hybridnets_original_pretrained.pth --num_gpus 1 --optim adamw --lr 1e-6' > bdd_10k_w_extra_ip2p_2_outputs_w_0.2.txt & 
 
 
             

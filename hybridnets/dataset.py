@@ -23,7 +23,7 @@ IMG_ROOT_FOLDER_NAME = "images_a"
 
 class BddDataset(Dataset):
     def __init__(self, params, is_train, inputsize=[640, 384], transform=None, seg_mode=MULTICLASS_MODE, debug=False,
-                 amount_to_run_on=None):
+                 amount_to_run_on=None, augmented_dataset_path: str = None, augmented_dataset_sample_rate: float = 0.5):
         """
         initial all the characteristic
 
@@ -34,12 +34,21 @@ class BddDataset(Dataset):
         -seg_mode: segmentation mode
         -debug: whether debug or not
         -amount_to_run_on: number of images to use
+        -augmented_dataset_path: path to augmented dataset
+        -augmented_dataset_sample_rate: sample rate of augmented dataset
         Returns:
         None
         """
         self.is_train = is_train
         self.transform = transform
         self.inputsize = inputsize
+        self.augmented_dataset_path = augmented_dataset_path
+        self.augmented_dataset_sample_rate = augmented_dataset_sample_rate
+        if self.augmented_dataset_path:
+            logging.info(f"Using augmented dataset: {self.augmented_dataset_path}\n with sample rate: {self.augmented_dataset_sample_rate}")
+        else:
+            logging.info(f"Not using augmented dataset")
+
         self.Tensor = transforms.ToTensor()
         img_root = Path(params.dataset['dataroot']) 
         label_root = Path(params.dataset['labelroot'])
@@ -75,6 +84,29 @@ class BddDataset(Dataset):
             raise NotImplementedError("No train_csv provided")
 
         logging.info(f"Number of avaliable images: {len(self.image_list)}")
+
+        # check how many of the files in the augmented dataset are in the original dataset
+        if self.augmented_dataset_path:
+            # check how many of the files in the augmented dataset are in the original dataset
+            augmented_dataset_image_paths = glob.glob(os.path.join(self.augmented_dataset_path, "*.jpg"))
+
+            self.image_path_augmented_image_paths_dict = {}
+
+            for image_path in self.image_list:
+                matching_paths = []
+                image_name = image_path.split("/")[-1].split(".")[0]  # Extracting the image name
+                
+                for augmented_path in augmented_dataset_image_paths:
+                    if image_name in augmented_path and "_source" not in augmented_path:
+                        matching_paths.append(augmented_path)
+                
+                self.image_path_augmented_image_paths_dict[image_path] = matching_paths
+            
+            # this code block is just to print how many images has augmented images:
+            list_of_images_with_augmented_images = [path for path in self.image_path_augmented_image_paths_dict.keys() if len(self.image_path_augmented_image_paths_dict[path]) > 0]
+            logging.info(f"Number of images in augmented dataset that are in the original dataset: {len(list_of_images_with_augmented_images)}")
+
+
 
         if amount_to_run_on:
             self.image_list = self.image_list[:amount_to_run_on]
@@ -187,6 +219,20 @@ class BddDataset(Dataset):
         data = self.db[index]
         det_label = data["label"]
         image_path = str(data["image"])
+        
+        if self.is_train and self.augmented_dataset_path is not None:
+            # find all files with the same name, ignore the string after the first underscore
+            # e.g. 000000_1.jpg and 000000_2.jpg will both be valid
+            # image_name = image_path.split('/')[-1].split('.')[0].split('_')[0]
+            # augmented_image_paths = glob.glob(os.path.join(self.augmented_dataset_path, image_name + '*'))
+            # # remove image that has '_source' in its name
+            # augmented_image_paths = [path for path in augmented_image_paths if '_source' not in Path(path).stem]
+            # if len(augmented_image_paths) > 0:
+            list_of_matching_augmented_image_paths = self.image_path_augmented_image_paths_dict[image_path]
+            if len(list_of_matching_augmented_image_paths) > 0:
+                if random.random() < self.augmented_dataset_sample_rate:
+                    image_path = random.choice(list_of_matching_augmented_image_paths)
+                    logging.info('augmented image path: {}'.format(image_path))
 
         img = cv2.imread(image_path, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -301,10 +347,11 @@ class BddDataset(Dataset):
         mosaic_this = False
         if self.is_train:
             if random.random() < self.dataset['mosaic']:
+                raise NotImplementedError('mosaic is not supported yet, need to add support for using the extra data')  
                 mosaic_this = True
                 # TODO: this doubles training time with inherent stuttering in tqdm, prob cpu or io bottleneck, does prefetch_generator work with ddp? (no improvement)
                 # TODO: updated, mosaic is inherently slow, maybe cache the images in RAM? maybe it was IO bottleneck of reading 4 images everytime? time it
-                img, labels, seg_label, (h0, w0), (h, w), path = self.load_mosaic(idx)
+                img, labels, seg_label, (h0, w0), (h, w), path = self.load_mosaic(idx, training=True)
 
                 # mixup is double mosaic, really slow
                 if random.random() < self.dataset['mixup']:

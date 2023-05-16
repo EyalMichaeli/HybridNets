@@ -28,7 +28,7 @@ normalization_stats = {
     "std": [0.229, 0.224, 0.225]
 }
 
-AMOUNT_TO_RUN_VAL_ON = 3300
+AMOUNT_TO_RUN_VAL_ON = 10000
 
 def denormalize(img):
     img = np.transpose(img, (1, 2, 0))
@@ -344,9 +344,9 @@ def val(model, val_generator, params, opt, seg_mode, is_training, pred_output_di
 
 if __name__ == "__main__":
     """
-    CUDA_VISIBLE_DEVICES=1 python val.py --cal_map "True" --conf_thres 0.6 -p bdd10k -c 3 \
-        -w logs/2023_0506_2317_04_bdd10k_extra_munit_5/checkpoints/hybridnets-d3_7_30000_best.pth \
-            --pred_output_dir logs/2023_0506_2317_04_bdd10k_extra_munit_5/step_30k
+    CUDA_VISIBLE_DEVICES=1 python val.py --cal_map "True" --conf_thres 0.5 -p bdd10k -c 3 \
+        -w logs/2023_0512_1354_02_bdd10k_repeat_base_one_class/checkpoints/hybridnets-d3_49_31250_best.pth \
+            --pred_output_dir logs/logs/2023_0512_1354_02_bdd10k_repeat_base_one_class/
     """
     ap = argparse.ArgumentParser()
     ap.add_argument('-p', '--project', type=str, default='bdd100k', help='Project file that contains parameters')
@@ -381,6 +381,7 @@ if __name__ == "__main__":
     obj_list = params.obj_list
     seg_mode = MULTILABEL_MODE if params.seg_multilabel else MULTICLASS_MODE if len(params.seg_list) > 1 else BINARY_MODE
 
+    logging.info(f"Using {AMOUNT_TO_RUN_VAL_ON} images for validation")
     valid_dataset = BddDataset(
         params=params,
         is_train=False,
@@ -392,7 +393,7 @@ if __name__ == "__main__":
             )
         ]),
         seg_mode=seg_mode,
-        amount_to_run_on=10
+        amount_to_run_on=AMOUNT_TO_RUN_VAL_ON
     )
 
     val_generator = DataLoaderX(
